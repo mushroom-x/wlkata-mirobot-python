@@ -1,7 +1,7 @@
 # wlkata-mirobot-python
 Wlkata Mirobot (6DoF Robot Arm) Python  SDK
 
-[中文说明](./README_CN.md)
+[Chinese](./README_CN.md)
 
 ## Install Package
 

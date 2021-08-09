@@ -8,7 +8,7 @@ setuptools.setup(name='wlkata-mirobot-python',
                  author='Shunkai Xing',
                  author_email='xingshunkai@qq.com',
                  long_description=open("README.md", "r", encoding="utf-8").read(),
-                 long_description_content_type='text/markdown',
+                 long_description_content_type = 'text/markdown',
                  url="https://github.com/mushroom-x/wlkata-mirobot-python",
                  packages=  ['wlkata_mirobot'],
                  classifiers="""
