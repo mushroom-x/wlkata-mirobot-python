@@ -1,11 +1,11 @@
 '''
 机械臂回归机械零点与状态查询
 '''
-from mirobot import Mirobot
+from wlkata_mirobot import WlkataMirobot
 import time
 
 print("实例化Mirobot机械臂实例")
-arm = Mirobot(portname='COM7', debug=False)
+arm = WlkataMirobot(portname='COM15', debug=True)
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")

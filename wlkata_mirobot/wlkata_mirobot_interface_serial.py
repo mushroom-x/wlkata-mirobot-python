@@ -235,7 +235,6 @@ class WlkataMirobotInterfaceSerial:
             # 读取消息
             # 这里其实存在问题就是这里的listen_to_device是死循环
             msg = self.serial_device.readline(timeout=0.1)
-            
             # 调试, 打印接收的消息
             if self._debug and not disable_debug:
                 self.logger.debug(f"[RECV] {msg}")

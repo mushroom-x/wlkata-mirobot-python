@@ -2,22 +2,22 @@
 
 import setuptools
 
-
-setuptools.setup(name='mirobot-py',
-                 version='v2.0.0-beta',
-                 description="A Python interface library for WKlata's Mirobot",
-                 author='Sourabh Cheedella',
-                 author_email='cheedella.sourabh@gmail.com',
+setuptools.setup(name='wlkata-mirobot-python',
+                 version='0.1',
+                 description="WKlata Mirobot Python SDK",
+                 author='Shunkai Xing',
+                 author_email='xingshunkai.@qq.com',
                  long_description=open("README.md", "r").read(),
                  long_description_content_type='text/markdown',
-                 url="https://github.com/rirze/mirobot-py",
-                 packages=['mirobot'],
+                 url="https://github.com/mushroom-x/wlkata-mirobot-python",
+                 packages=['wlkata-mirobot-python'],
                  classifiers="""
                  Development Status :: 4 - Beta
                  Programming Language :: Python :: 3 :: Only
                  Programming Language :: Python :: 3.6
                  Programming Language :: Python :: 3.7
                  Programming Language :: Python :: 3.8
+                 Programming Language :: Python :: 3.9
                  License :: OSI Approved :: MIT License
                  Operating System :: OS Independent
                  Operating System :: Microsoft :: Windows
@@ -41,6 +41,6 @@ setuptools.setup(name='mirobot-py',
                  """.splitlines(),
                  python_requires='>=3.6',
                  install_requires=open('requirements.txt', 'r').read().splitlines(),
-                 package_dir={'mirobot': 'mirobot'},
-                 package_data={'mirobot': ['resources/*']}
+                 package_dir={'wlkata_mirobot': 'wlkata_mirobot'},
+                 package_data={'wlkata_mirobot': ['resources/*']}
 )

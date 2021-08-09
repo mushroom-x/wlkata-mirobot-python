@@ -18,7 +18,7 @@ class WlkataMirobotDeviceSerial:
     A class for establishing a connection to a serial device. 
     Mirobot串口设备
     """
-    def __init__(self, portname='', baudrate=0, stopbits=1, timeout=0, exclusive=False, debug=False):
+    def __init__(self, portname='', baudrate=0, stopbits=1, timeout=0.2, exclusive=False, debug=False):
         """ Initialization of `WlkataMirobotDeviceSerial` class
         串口设备初始化
 
@@ -119,23 +119,20 @@ class WlkataMirobotDeviceSerial:
             TODO 这里是存在一些不确定性的，因为可能读取的时候，还没有接收到换行符
         """
         t_start = time.time()
+        msg_recv = b''
         while self._is_open:
             # 超时判断
             t_cur = time.time()
             if (t_cur - t_start) >= timeout:
-                return b''
+                return msg_recv.decode("utf-8").strip()
             
             try:
-                # 读取一行
-                msg = self.serialport.readline()
-                # 返回读取的数据
-                if msg != b'':
-                    msg = msg.decode().strip()
-                    return msg
-
+                msg_seg = self.serialport.readline()
+                if len(msg_seg) > 0:
+                    msg_recv += msg_seg
             except Exception as e:
                 self.logger.exception(SerialDeviceReadError(e))
-
+                
     def open(self):
         """ Open the serial port. 
         打开串口

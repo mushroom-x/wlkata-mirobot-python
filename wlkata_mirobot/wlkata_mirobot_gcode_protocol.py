@@ -119,8 +119,8 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         formatter = logging.Formatter(f"[{self.default_portname}] [%(levelname)s] %(message)s")
         self.stream_handler.setFormatter(formatter)
         # self.logger.addHandler(self.stream_handler)
-
-        self.reset_file = pkg_resources.read_text('mirobot.resources', 'reset.xml') if reset_file is None else reset_file
+        # 读取重置文件
+        self.reset_file = pkg_resources.read_text('wlkata_mirobot.resources', 'reset.xml') if reset_file is None else reset_file
         """ The reset commands to use when resetting the Mirobot. See `WlkataMirobotGcodeProtocol.reset_configuration` for usage and details. """
         self._debug = debug
         """ Boolean that determines if every input and output is to be printed to the screen. """

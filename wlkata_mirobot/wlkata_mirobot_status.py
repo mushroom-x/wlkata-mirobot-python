@@ -4,8 +4,7 @@ Mirobot的状态信息, 包括:
 - `MirobotCartesians`: 机械臂末端在笛卡尔坐标系下的位姿
 - `MirobotStatus`: 机械臂系统状态
 """
-
-from dataclasses import asdict, astuple, fields
+from dataclasses import dataclass, asdict, astuple, fields
 import numbers
 import operator
 
