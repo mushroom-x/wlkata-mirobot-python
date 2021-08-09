@@ -10,7 +10,7 @@ setuptools.setup(name='wlkata-mirobot-python',
                  long_description=open("README.md", "r").read(),
                  long_description_content_type='text/markdown',
                  url="https://github.com/mushroom-x/wlkata-mirobot-python",
-                 packages=['wlkata-mirobot-python'],
+                 packages= setuptools.find_packages('wlkata-mirobot', exclude=['example', 'doc', 'image']),
                  classifiers="""
                  Development Status :: 4 - Beta
                  Programming Language :: Python :: 3 :: Only
