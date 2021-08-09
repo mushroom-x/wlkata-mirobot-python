@@ -1,9 +1,9 @@
 '''
 获取机械臂的状态
 '''
-from mirobot import Mirobot
+from wlkata_mirobot import WlkataMirobot
 import time
-arm = Mirobot(portname='COM7', debug=False)
+arm = WlkataMirobot(portname='COM7', debug=False)
 
 # 注:一定要配置为wait=False,非阻塞式等待
 # 要不然会卡死

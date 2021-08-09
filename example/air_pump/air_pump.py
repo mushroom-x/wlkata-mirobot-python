@@ -1,9 +1,10 @@
 '''
 气泵控制
 '''
-from mirobot import Mirobot
+from wlkata_mirobot import WlkataMirobot
 import time
-arm = Mirobot(portname='COM7', debug=False)
+
+arm = WlkataMirobot(portname='COM7', debug=False)
 arm.home_simultaneous()
 
 # 气泵开启

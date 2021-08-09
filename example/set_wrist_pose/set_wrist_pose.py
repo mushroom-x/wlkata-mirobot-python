@@ -1,9 +1,11 @@
 '''
 机械臂腕关节的位置控制, 点控 point to point
 '''
-from mirobot import Mirobot
+from wlkata_mirobot import WlkataMirobot
 import time
-arm = Mirobot(portname='COM7', debug=True)
+# 创建机械臂
+arm = WlkataMirobot(portname='COM7', debug=True)
+# Homing
 arm.home_simultaneous()
 
 print("运动到目标点 A")

@@ -1,9 +1,9 @@
 '''
 设置机械臂关节的角度, 单位°
 '''
-from mirobot import Mirobot
+from wlkata_mirobot import WlkataMirobot
 import time
-arm = Mirobot(portname='COM7', debug=False)
+arm = WlkataMirobot(portname='COM15', debug=False)
 arm.home_simultaneous()
 
 # 设置单个关节的角度
