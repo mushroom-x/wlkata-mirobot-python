@@ -281,7 +281,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
             status_str_list = self.get_status(disable_debug=disable_debug)
 
             for msg_seg in status_str_list:
-                if "<" in msg_seg:
+                if "<" in msg_seg and ">" in msg_seg:
                     status_msg = msg_seg
                     try:
                         ret, status = self._parse_status(status_msg)
@@ -327,8 +327,9 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         return_status = MirobotStatus()
         # 用正则表达式进行匹配
         state_regex = r'<([^,]*),Angle\(ABCDXYZ\):([-\.\d,]*),Cartesian coordinate\(XYZ RxRyRz\):([-.\d,]*),Pump PWM:(\d+),Valve PWM:(\d+),Motion_MODE:(\d)>'
-
-        regex_match = re.match(state_regex, msg)# re.fullmatch(state_regex, msg)
+        # While re.search() searches for the whole string even if the string contains multi-lines and tries to find a match of the substring in all the lines of string.
+        # 注: 把re.match改为re.search
+        regex_match = re.search(state_regex, msg)# re.fullmatch(state_regex, msg)
         
         if regex_match:
             try:
