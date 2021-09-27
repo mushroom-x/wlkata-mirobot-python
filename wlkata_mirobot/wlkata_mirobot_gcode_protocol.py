@@ -31,8 +31,18 @@ os_is_posix = os.name == 'posix'
 
 class WlkataMirobotGcodeProtocol(AbstractContextManager):
     """ A base class for managing and maintaining known Mirobot operations. """
-
-    def __init__(self, *device_args, debug=True, connection_type='serial', autoconnect=True, autofindport=True, exclusive=True, valve_pwm_values=('65', '40'), pump_pwm_values=('0', '1000'), default_speed=2000, reset_file=None, wait=True, **device_kwargs):
+    # 机械爪张开与闭合的PWM值
+    GRIPPER_OPEN_PWM_VALUE = 40
+    GRIPPER_CLOSE_PWM_VALUE = 60
+    # 爪子间距范围(单位mm)
+    GRIPPER_SPACING_MIN = 0.0
+    GRIPPER_SPACING_MAX = 30.0
+    # 爪子运动学参数定义(单位mm)
+    GRIPPER_LINK_A = 9.5    # 舵机舵盘与中心线之间的距离
+    GRIPPER_LINK_B = 18.0   # 连杆的长度
+    GRIPPER_LINK_C = 3.0    # 平行爪向内缩的尺寸
+    
+    def __init__(self, *device_args, debug=False, connection_type='serial', autoconnect=True, autofindport=True, exclusive=True, valve_pwm_values=('65', '40'), pump_pwm_values=('0', '1000'), default_speed=2000, reset_file=None, wait=True, **device_kwargs):
         """
         Initialization of the `WlkataMirobotGcodeProtocol` class.
         初始化`WlkataMirobotGcodeProtocol`类
@@ -53,7 +63,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         autofindport : bool
             (Default value = `True`) Whether to automatically find the serial port that the Mirobot is attached to. If this is `False`, you must specify `portname='<portname>'` in `*serial_device_args`.
         valve_pwm_values : indexible-collection[str or numeric]
-            (Default value = `('65', '40')`) The 'on' and 'off' values for the valve in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_valve` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.valve_pwm_values`.
+            (Default value = `('60', '40')`) The 'on' and 'off' values for the valve in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_valve` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.valve_pwm_values`.
         pump_pwm_values : indexible-collection[str or numeric]
             (Default value = `('0', '1000')`) The 'on' and 'off' values for the pnuematic pump in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_air_pump` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.pump_pwm_values`.
         default_speed : int
@@ -779,7 +789,7 @@ message
         self.set_valve(self.valve_pwm_values[1], wait=False) # 电磁阀打开
         time.sleep(1)
         self.set_valve(self.valve_pwm_values[0], wait=False) # 电磁阀关闭
-
+    
     # set the pwm of the air pump
     def set_air_pump(self, pwm, wait=None):
         """
@@ -836,6 +846,47 @@ message
         msg = f'M4E{pwm}'
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
+    def set_gripper_spacing(self, spacing_mm):
+        '''设置爪子间距'''
+        # 判断是否是合法的spacing约束下
+        spacing_mm = max(self.GRIPPER_SPACING_MIN, min(self.GRIPPER_SPACING_MAX, spacing_mm))
+        # 逆向运动学
+        d1 = spacing_mm / 2 + self.GRIPPER_LINK_C - self.GRIPPER_LINK_A
+        theta = math.degrees(math.asin(d1/self.GRIPPER_LINK_B))
+        # 旋转角度转换为PWM值
+        pwm = self.GRIPPER_CLOSE_PWM_VALUE + (theta / 45.0) * (self.GRIPPER_OPEN_PWM_VALUE - self.GRIPPER_CLOSE_PWM_VALUE)
+        # 设置爪子的PWM
+        self.set_gripper(pwm)
+        
+    def gripper_open(self):
+        '''爪子开启'''
+        self.set_gripper(self.GRIPPER_OPEN_PWM_VALUE)
+    
+    def gripper_close(self):
+        '''爪子闭合'''
+        self.set_gripper(self.GRIPPER_CLOSE_PWM_VALUE)
+    
+    def gripper_close(self):
+        '''爪子闭合'''
+        pass
+    
+    def set_gripper(self, pwm, wait=None):
+        '''设置爪子的PWM'''
+        # 类型约束
+        if isinstance(pwm, bool):
+            if pwm == True:
+                pwm = self.GRIPPER_CLOSE_PWM_VALUE
+            else:
+                pwm = self.GRIPPER_OPEN_PWM_VALUE
+        pwm = int(pwm)
+        # 数值约束
+        lowerb = min([self.GRIPPER_OPEN_PWM_VALUE, self.GRIPPER_CLOSE_PWM_VALUE])
+        upperb = max([self.GRIPPER_OPEN_PWM_VALUE, self.GRIPPER_CLOSE_PWM_VALUE])
+        pwm = max(lowerb, min(upperb, pwm))
+        
+        msg = f'M3S{pwm}'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+    
     def start_calibration(self, wait=None):
         """
         Starts the calibration sequence by setting all eeprom variables to zero. (Command: `M40`)

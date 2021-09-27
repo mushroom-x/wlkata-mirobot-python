@@ -3,7 +3,7 @@
 import setuptools
 
 setuptools.setup(name='wlkata-mirobot-python',
-                 version='0.1.3',
+                 version='0.1.4',
                  description="WKlata Mirobot Python SDK",
                  author='Shunkai Xing',
                  author_email='xingshunkai@qq.com',
