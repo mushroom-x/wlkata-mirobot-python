@@ -7,9 +7,22 @@ import time
 arm = WlkataMirobot(portname='COM12', debug=False)
 arm.home_simultaneous()
 
-# 气泵开启
-arm.pump_on()
+# 气泵开启-吸气
+arm.pump_suction()
 # 等待5s
 time.sleep(5)
+
 # 气泵关闭
 arm.pump_off()
+# 等待5s
+time.sleep(2)
+
+# 气泵开启-吹气
+arm.pump_blowing()
+# 等待5s
+time.sleep(5)
+
+# 气泵关闭
+arm.pump_off()
+# 等待5s
+time.sleep(2)

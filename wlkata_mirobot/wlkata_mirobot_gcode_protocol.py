@@ -1,6 +1,7 @@
 """
 Mirobot GCode通信协议
 """
+import math
 from collections.abc import Collection
 from contextlib import AbstractContextManager
 import logging
@@ -31,6 +32,13 @@ os_is_posix = os.name == 'posix'
 
 class WlkataMirobotGcodeProtocol(AbstractContextManager):
     """ A base class for managing and maintaining known Mirobot operations. """
+    # 气泵PWM值
+    AIR_PUMP_OFF_PWM_VALUE = 0
+    AIR_PUMP_BLOWING_PWM_VALUE = 500
+    AIR_PUMP_SUCTION_PWM_VALUE = 1000
+    # 电磁阀PWM值
+    VALVE_OFF_PWM_VALUE = 65
+    VALVE_ON_PWM_VALUE = 40 
     # 机械爪张开与闭合的PWM值
     GRIPPER_OPEN_PWM_VALUE = 40
     GRIPPER_CLOSE_PWM_VALUE = 60
@@ -42,7 +50,9 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
     GRIPPER_LINK_B = 18.0   # 连杆的长度
     GRIPPER_LINK_C = 3.0    # 平行爪向内缩的尺寸
     
-    def __init__(self, *device_args, debug=False, connection_type='serial', autoconnect=True, autofindport=True, exclusive=True, valve_pwm_values=('65', '40'), pump_pwm_values=('0', '1000'), default_speed=2000, reset_file=None, wait=True, **device_kwargs):
+    def __init__(self, *device_args, debug=False, connection_type='serial', \
+        autoconnect=True, autofindport=True, exclusive=True, \
+        default_speed=2000, reset_file=None, wait=True, **device_kwargs):
         """
         Initialization of the `WlkataMirobotGcodeProtocol` class.
         初始化`WlkataMirobotGcodeProtocol`类
@@ -63,7 +73,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         autofindport : bool
             (Default value = `True`) Whether to automatically find the serial port that the Mirobot is attached to. If this is `False`, you must specify `portname='<portname>'` in `*serial_device_args`.
         valve_pwm_values : indexible-collection[str or numeric]
-            (Default value = `('60', '40')`) The 'on' and 'off' values for the valve in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_valve` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.valve_pwm_values`.
+            (Default value = `('65', '40')`) The 'on' and 'off' values for the valve in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_valve` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.valve_pwm_values`.
         pump_pwm_values : indexible-collection[str or numeric]
             (Default value = `('0', '1000')`) The 'on' and 'off' values for the pnuematic pump in terms of PWM. Useful if your Mirobot is not calibrated correctly and requires different values to open and close. `WlkataMirobotGcodeProtocol.set_air_pump` will only accept booleans and the values in this parameter, so if you have additional values you'd like to use, pass them in as additional elements in this tuple. Stored in `WlkataMirobotGcodeProtocol.pump_pwm_values`.
         default_speed : int
@@ -134,10 +144,20 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         """ The reset commands to use when resetting the Mirobot. See `WlkataMirobotGcodeProtocol.reset_configuration` for usage and details. """
         self._debug = debug
         """ Boolean that determines if every input and output is to be printed to the screen. """
-
-        self.valve_pwm_values = tuple(str(n) for n in valve_pwm_values)
+        
         """ Collection of values to use for PWM values for valve module. First value is the 'On' position while the second is the 'Off' position. Only these values may be permitted. """
-        self.pump_pwm_values = tuple(str(n) for n in pump_pwm_values)
+        # 气泵PWM值
+        self.pump_pwm_values = [
+            self.AIR_PUMP_SUCTION_PWM_VALUE,
+            self.AIR_PUMP_BLOWING_PWM_VALUE,
+            self.AIR_PUMP_OFF_PWM_VALUE
+        ]
+        # 电磁阀PWM值
+        self.valve_pwm_values = [
+            self.VALVE_OFF_PWM_VALUE,
+            self.VALVE_ON_PWM_VALUE
+        ]
+        # self.pump_pwm_values = tuple(str(n) for n in pump_pwm_values)
         """ Collection of values to use for PWM values for pnuematic pump module. First value is the 'On' position while the second is the 'Off' position. Only these values may be permitted. """
         self.default_speed = default_speed
         """ The default speed to use when issuing commands that involve the speed parameter. """
@@ -782,23 +802,33 @@ message
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
-    def pump_on(self):
+    
+    def pump_suction(self):
+        '''气泵吸气'''
+        self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) # 气泵吸气
+    
+    def pump_blowing(self):
+        '''气泵吹气'''
+        self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE) # 气泵吹气
+    
+    def pump_on(self, is_suction=True):
         """
-        气泵开启, 吸气
+        气泵开启, 吸气/吹气
         """
-        # pump_pwm_values=('0', '1000')
-        self.set_air_pump(self.pump_pwm_values[1]) # 气泵打开
+        if is_suction:
+            self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) # 气泵吸气
+        else:
+            self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE) # 气泵吹气
     
     def pump_off(self):
         """
         气泵关闭, 电磁阀开启, 放气
         """
-        # valve_pwm_values=('65', '40'),
-        self.set_air_pump(self.pump_pwm_values[0], wait=False) # 气泵关闭
-        self.set_valve(self.valve_pwm_values[1], wait=False) # 电磁阀打开
+        self.set_air_pump(self.AIR_PUMP_OFF_PWM_VALUE, wait=False)
+        self.set_valve(self.VALVE_ON_PWM_VALUE, wait=False)
         time.sleep(1)
-        self.set_valve(self.valve_pwm_values[0], wait=False) # 电磁阀关闭
-    
+        self.set_valve(self.VALVE_OFF_PWM_VALUE, wait=False)
+        
     # set the pwm of the air pump
     def set_air_pump(self, pwm, wait=None):
         """
@@ -818,13 +848,10 @@ message
             If `wait` is `True`, then return a list of strings which contains message output.
             If `wait` is `False`, then return whether sending the message succeeded.
         """
-
-        if isinstance(pwm, bool):
-            pwm = self.pump_pwm_values[not pwm]
-
-        if str(pwm) not in self.pump_pwm_values:
+        
+        if pwm not in self.pump_pwm_values:
             self.logger.exception(ValueError(f'pwm must be one of these values: {self.pump_pwm_values}. Was given {pwm}.'))
-
+            pwm = self.AIR_PUMP_OFF_PWM_VALUE
         msg = f'M3S{pwm}'
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -845,25 +872,30 @@ message
             If `wait` is `True`, then return a list of strings which contains message output.
             If `wait` is `False`, then return whether sending the message succeeded.
         """
-
-        if isinstance(pwm, bool):
-            pwm = self.valve_pwm_values[not pwm]
-
-        if str(pwm) not in self.valve_pwm_values:
+        if pwm not in self.valve_pwm_values:
             self.logger.exception(ValueError(f'pwm must be one of these values: {self.valve_pwm_values}. Was given {pwm}.'))
-
+            pwm = self.VALVE_OFF_PWM_VALUE
         msg = f'M4E{pwm}'
         return self.send_msg(msg, wait=wait, wait_idle=True)
-
+    
+    def gripper_inverse_kinematic(self, spacing_mm):
+        '''爪子逆向运动学'''
+        d1 = (spacing_mm / 2) + self.GRIPPER_LINK_C - self.GRIPPER_LINK_A
+        theta = math.degrees(math.asin(d1/self.GRIPPER_LINK_B))
+        return theta
+    
     def set_gripper_spacing(self, spacing_mm):
         '''设置爪子间距'''
         # 判断是否是合法的spacing约束下
         spacing_mm = max(self.GRIPPER_SPACING_MIN, min(self.GRIPPER_SPACING_MAX, spacing_mm))
         # 逆向运动学
-        d1 = spacing_mm / 2 + self.GRIPPER_LINK_C - self.GRIPPER_LINK_A
-        theta = math.degrees(math.asin(d1/self.GRIPPER_LINK_B))
+        theta = self.gripper_inverse_kinematic(spacing_mm)
+        angle_min = self.gripper_inverse_kinematic(self.GRIPPER_SPACING_MIN)
+        angle_max = self.gripper_inverse_kinematic(self.GRIPPER_SPACING_MAX)
         # 旋转角度转换为PWM值
-        pwm = self.GRIPPER_CLOSE_PWM_VALUE + (theta / 45.0) * (self.GRIPPER_OPEN_PWM_VALUE - self.GRIPPER_CLOSE_PWM_VALUE)
+        ratio = ((theta - angle_min) / (angle_max - angle_min))
+        pwm = int(self.GRIPPER_CLOSE_PWM_VALUE + ratio * (self.GRIPPER_OPEN_PWM_VALUE - self.GRIPPER_CLOSE_PWM_VALUE))
+        print(f"爪子逆向运动学 角度:{theta}  angle_min: {angle_min} angle_max: {angle_max} PWM: {pwm}")
         # 设置爪子的PWM
         self.set_gripper(pwm)
         
@@ -874,10 +906,6 @@ message
     def gripper_close(self):
         '''爪子闭合'''
         self.set_gripper(self.GRIPPER_CLOSE_PWM_VALUE)
-    
-    def gripper_close(self):
-        '''爪子闭合'''
-        pass
     
     def set_gripper(self, pwm, wait=None):
         '''设置爪子的PWM'''
