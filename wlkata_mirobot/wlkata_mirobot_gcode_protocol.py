@@ -472,6 +472,15 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         return self.send_msg(msg, wait=wait)
 
     @staticmethod
+    def _format_float_value(value):
+        if vlaue is None:
+            return value
+        if isinstance(value, float):
+            # 精确到小数点后两位数
+            return round(value , 2)
+        else:
+            return value
+    @staticmethod
     def _generate_args_string(instruction, pairings):
         """
         A helper methods to generate argument strings for the various movement instructions.
@@ -492,7 +501,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 message
             A string containing the base command followed by the correctly formatted arguments.
         """
-        args = [f'{arg_key}{value}' for arg_key, value in pairings.items() if value is not None]
+        args = [f'{arg_key}{self._format_float_value(value)}' for arg_key, value in pairings.items() if value is not None]
 
         return ' '.join([instruction] + args)
     

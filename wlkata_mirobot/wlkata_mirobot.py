@@ -1,6 +1,7 @@
 """
 Mirobot主类
 """
+import math
 from collections import namedtuple
 from typing import NamedTuple
 
@@ -171,7 +172,6 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
 
         return super().go_to_cartesian_lin(**inputs,
                                            speed=speed, wait=wait)
-    
     def set_wrist_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait=None):
         """
         设置腕关节的位姿
