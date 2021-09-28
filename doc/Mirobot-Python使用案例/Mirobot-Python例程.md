@@ -16,12 +16,12 @@ arm = Mirobot(portname='COM7', debug=False)
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
-arm.home_simultaneous(wait=True)
+arm.home_simultaneous(=True)
 print("机械臂Homing结束")
 
 # 状态更新与查询
 print("更新机械臂状态")
-arm.update_status()
+arm.get_status()
 print(f"更新后的状态对象: {arm.status}")
 print(f"更新后的状态名称: {arm.status.state}")
 ```
@@ -49,7 +49,7 @@ arm.home_simultaneous()
 
 # 设置单个关节的角度
 print("测试设置单个关节的角度")
-arm.set_joint_angle({1:100.0}, wait=True)
+arm.set_joint_angle({1:100.0}, =True)
 print("动作执行完毕")
 # 状态查询
 print(f"状态查询: {arm.get_status()}")
@@ -59,7 +59,7 @@ time.sleep(2)
 # 设置多个关节的角度
 print("设置多个关节的角度")
 target_angles = {1:90.0, 2:30.0, 3:-20.0, 4:10.0, 5:0.0, 6:90.0}
-arm.set_joint_angle(target_angles, wait=True)
+arm.set_joint_angle(target_angles, =True)
 print("动作执行完毕")
 # 状态查询
 print(f"状态查询: {arm.get_status()}")

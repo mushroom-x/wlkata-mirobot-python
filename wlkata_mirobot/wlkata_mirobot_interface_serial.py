@@ -96,7 +96,7 @@ class WlkataMirobotInterfaceSerial:
         self._debug = bool(value)
         self.serial_device.setDebug(value)
 
-    def send(self, msg, disable_debug=False, terminator=os.linesep, wait=True, wait_idle=False):
+    def send(self, msg, disable_debug=False, terminator=os.linesep, wait_ok=False, wait_idle=False):
         """
         Send a message to the Mirobot.
 
@@ -110,16 +110,16 @@ class WlkataMirobotInterfaceSerial:
             (Default value = `False`) Whether to override the class debug setting. Used primarily by ` WlkataMirobotGcodeProtocol.device.wait_until_idle`.
         terminator : str
             (Default value = `os.linesep`) The line separator to use when signaling a new line. Usually `'\\r\\n'` for windows and `'\\n'` for modern operating systems.
-        wait : bool
-            (Default value = `None`) Whether to wait for output to end and to return that output. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to end and to return that output. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
         wait_idle : bool
-            (Default value = `False`) Whether to wait for Mirobot to be idle before returning.
+            (Default value = `False`) Whether to  for Mirobot to be idle before returning.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         # 发送消息前需要先清除缓冲区
         cache_msg = self.empty_cache()
@@ -127,16 +127,23 @@ class WlkataMirobotInterfaceSerial:
             # 将缓冲数据打印出来
             if len(cache_msg) != 0:
                 self.logger.debug(f"[RECV CACHE] {cache_msg}")
-    
+
         output = self.serial_device.send(msg, terminator=terminator)
         
         if self._debug and not disable_debug:
             self.logger.debug(f"[SENT] {msg}")
 
+        if wait_ok is None:
+            wait_ok = False
+        
+        if wait_idle is None:
+            wait_idle = False
+            
+        if wait_ok:
+            output = self.wait_for_ok(disable_debug=disable_debug)
+        
         if wait_idle:
             self.wait_until_idle()
-        elif wait:
-            output = self.wait_for_ok(disable_debug=disable_debug)
         
         return output
     
@@ -274,17 +281,12 @@ class WlkataMirobotInterfaceSerial:
             A list of output strings upto and including the terminal string.
         """
         # 更新一下当前Mirobot的状态
-        self.mirobot.update_status(disable_debug=True)
+        self.mirobot.get_status(disable_debug=True)
         # self.mirobot.update_status(disable_debug=False)
         while self.mirobot.status is None or self.mirobot.status.state != 'Idle':
             time.sleep(refresh_rate)
             # 不断的发送状态查询, 更新状态
-            self.mirobot.update_status(disable_debug=True)
-            # self.mirobot.update_status(disable_debug=False)
-            # 打印mirobot当前的状态
-            if self.mirobot.status is not None:
-                self.logger.debug(f"current mirobot state: {self.mirobot.status.state}")
-            
+            self.mirobot.get_status(disable_debug=True)
     def empty_cache(self):
         """ 
         清空接收缓冲区

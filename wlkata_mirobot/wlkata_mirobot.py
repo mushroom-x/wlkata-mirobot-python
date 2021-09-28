@@ -6,10 +6,9 @@ from collections import namedtuple
 from typing import NamedTuple
 
 from .wlkata_mirobot_gcode_protocol import WlkataMirobotGcodeProtocol
-from .wlkata_mirobot_end_relative_motion import MirobotEndRelativeMotion
+# from .wlkata_mirobot_end_relative_motion import MirobotEndRelativeMotion
 from .wlkata_mirobot_status import MirobotAngles, MirobotCartesians
 
-# ?
 dim_splitter: NamedTuple = namedtuple('dim_spliter', ['cartesian', 'angle', 'rail'])
 cartesian_type_splitter: NamedTuple = namedtuple('cartesian_type_splitter', ['ptp', 'lin'])
 left_right_splitter: NamedTuple = namedtuple('left_right_splitter', ['left', 'right'])
@@ -43,7 +42,7 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         """
         super().__init__(*base_mirobot_args, **base_mirobot_kwargs)
 
-        self._rover = MirobotEndRelativeMotion(self)
+        # self._rover = MirobotEndRelativeMotion(self)
 
         self.move = dim_splitter(cartesian=cartesian_type_splitter(ptp=self.go_to_cartesian_ptp,
                                                                    lin=self.go_to_cartesian_lin),
@@ -55,22 +54,22 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
                                                                         lin=self.increment_cartesian_lin),
                                       angle=self.increment_axis,
                                       rail=self.increment_slide_rail)
-        """ The root of the increment alias. Uses `increment_...` methods. Can be used as `mirobot.increment.ptp(...)` or `mirobot.increment.angle(...)` """
-        self.wheel = four_way_splitter(upper=left_right_splitter(left=self._rover.move_upper_left,
-                                                                 right=self._rover.move_upper_right),
-                                       lower=left_right_splitter(left=self._rover.move_bottom_left,
-                                                                 right=self._rover.move_bottom_right),
-                                       left=upper_lower_splitter(upper=self._rover.move_upper_left,
-                                                                 lower=self._rover.move_bottom_left),
-                                       right=upper_lower_splitter(upper=self._rover.move_upper_right,
-                                                                  lower=self._rover.move_bottom_right))
+        # """ The root of the increment alias. Uses `increment_...` methods. Can be used as `mirobot.increment.ptp(...)` or `mirobot.increment.angle(...)` """
+        # self.wheel = four_way_splitter(upper=left_right_splitter(left=self._rover.move_upper_left,
+        #                                                          right=self._rover.move_upper_right),
+        #                                lower=left_right_splitter(left=self._rover.move_bottom_left,
+        #                                                          right=self._rover.move_bottom_right),
+        #                                left=upper_lower_splitter(upper=self._rover.move_upper_left,
+        #                                                          lower=self._rover.move_bottom_left),
+        #                                right=upper_lower_splitter(upper=self._rover.move_upper_right,
+        #                                                           lower=self._rover.move_bottom_right))
 
-        self.rover = rover_splitter(wheel=self.wheel,
-                                    rotate=left_right_splitter(left=self._rover.rotate_left,
-                                                               right=self._rover.rotate_right),
-                                    move=forward_backward_splitter(forward=self._rover.move_forward,
-                                                                   backward=self._rover.move_backward))
-        """ The root of the rover alias. Uses methods from `mirobot.base_rover.BaseRover`. Can be used as `mirobot.rover.wheel.upper.right(...)` or `mirobot.rover.rotate.left(...)` or `mirobot.rover.move.forward(...)`"""
+        # self.rover = rover_splitter(wheel=self.wheel,
+        #                             rotate=left_right_splitter(left=self._rover.rotate_left,
+        #                                                        right=self._rover.rotate_right),
+        #                             move=forward_backward_splitter(forward=self._rover.move_forward,
+        #                                                            backward=self._rover.move_backward))
+        # """ The root of the rover alias. Uses methods from `mirobot.base_rover.BaseRover`. Can be used as `mirobot.rover.wheel.upper.right(...)` or `mirobot.rover.rotate.left(...)` or `mirobot.rover.move.forward(...)`"""
 
     @property
     def state(self):
@@ -115,26 +114,8 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         """ Whether Mirobot is currently in coordinate mode (`False`) or joint-motion mode (`True`) """
         return self.status.motion_mode
 
-    def go_to_zero(self, speed=None, wait=None):
-        """
-        Send all axes to their respective zero positions.
 
-        Parameters
-        ----------
-        speed : int
-            (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
-
-        Returns
-        -------
-        msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
-        """
-        return self.go_to_axis(0, 0, 0, 0, 0, 0, 0, speed=speed, wait=wait)
-
-    def go_to_cartesian_lin(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait=None):
+    def go_to_cartesian_lin(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None):
         """
         Linear move to a position in cartesian coordinates. (Command: `M20 G90 G1`)
 
@@ -155,14 +136,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Orientation angle: Yaw angle
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if isinstance(x, MirobotCartesians):
             inputs = x.asdict()
@@ -171,8 +152,8 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
 
         return super().go_to_cartesian_lin(**inputs,
-                                           speed=speed, wait=wait)
-    def set_wrist_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait=None):
+                                           speed=speed, wait_ok=wait_ok)
+    def set_wrist_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait_ok=None):
         """
         设置腕关节的位姿
 
@@ -196,26 +177,26 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             `linear`: 直线插补(Linear Interpolation)
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if mode == "p2p":
             # 点控模式 Point To Point
-            self.go_to_cartesian_ptp(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait=wait)
+            self.go_to_cartesian_ptp(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
         elif mode == "linear":
             # 直线插补 Linera Interpolation
-            self.go_to_cartesian_lin(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait=wait)
+            self.go_to_cartesian_lin(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
         else:
             # 默认是点到点
-            self.go_to_cartesian_ptp(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait=wait)
+            self.go_to_cartesian_ptp(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
 
-    def go_to_cartesian_ptp(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait=None):
+    def go_to_cartesian_ptp(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None):
         """
         Point-to-point move to a position in cartesian coordinates. (Command: `M20 G90 G0`)
 
@@ -236,14 +217,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Orientation angle: Yaw angle
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
 
         if isinstance(x, MirobotCartesians):
@@ -253,9 +234,9 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
 
         return super().go_to_cartesian_ptp(**inputs,
-                                           speed=speed, wait=wait)
+                                           speed=speed, wait_ok=wait_ok)
 
-    def go_to_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait=None):
+    def go_to_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait_ok=None):
         """
         Send all axes to a specific position in angular coordinates. (Command: `M21 G90`)
 
@@ -278,14 +259,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Location of slide rail module.
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if isinstance(x, MirobotAngles):
             inputs = x.asdict()
@@ -294,9 +275,9 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c, 'd': d}
 
         return super().go_to_axis(**inputs,
-                                  speed=speed, wait=wait)
+                                  speed=speed, wait_ok=wait_ok)
 
-    def increment_cartesian_lin(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait=None):
+    def increment_cartesian_lin(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None):
         """
         Linear increment in cartesian coordinates. (Command: `M20 G91 G1`)
 
@@ -317,14 +298,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Orientation angle: Yaw angle
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if isinstance(x, MirobotCartesians):
             inputs = x.asdict()
@@ -333,9 +314,9 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
 
         return super().increment_cartesian_lin(**inputs,
-                                               speed=speed, wait=wait)
+                                               speed=speed, wait_ok=wait_ok)
 
-    def increment_cartesian_ptp(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait=None):
+    def increment_cartesian_ptp(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None):
         """
         Point-to-point increment in cartesian coordinates. (Command: `M20 G91 G0`)
 
@@ -356,14 +337,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Orientation angle: Yaw angle
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if isinstance(x, MirobotCartesians):
             inputs = x.asdict()
@@ -372,9 +353,9 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
 
         return super().increment_cartesian_ptp(**inputs,
-                                               speed=speed, wait=wait)
+                                               speed=speed, wait_ok=wait_ok)
 
-    def increment_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait=None):
+    def increment_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait_ok=None):
         """
         Increment all axes a specified amount in angular coordinates. (Command: `M21 G91`)
 
@@ -397,14 +378,14 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             (Default value = `None`) Location of slide rail module.
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
         if isinstance(x, MirobotAngles):
             inputs = x.asdict()
@@ -413,9 +394,17 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             inputs = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c, 'd': d}
 
         return super().increment_axis(**inputs,
-                                      speed=speed, wait=wait)
+                                      speed=speed, wait_ok=wait_ok)
 
-    def increment_slide_rail(self, d, speed=None, wait=None):
+    def set_slider_range(self, slider_length):
+        '''设置滑台的范围'''
+        self.slider_length = slider_length
+        if slider_length <= 0:
+            self.logger.warn(f"Illegal slider range {slider_length} mm")
+            return False
+        msg = f''
+        
+    def increment_slide_rail(self, d, speed=None, wait_ok=None):
         """
         Increment slide rail position a specified amount. (Command: `M21 G91`)
 
@@ -425,20 +414,20 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             Location of slide rail module.
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
 
         return super().increment_axis(d=d,
-                                      speed=speed, wait=wait)
+                                      speed=speed, wait_ok=wait_ok)
 
-    def go_to_slide_rail(self, d, speed=None, wait=None):
+    def go_to_slide_rail(self, d, speed=None, wait_ok=None):
         """
         Go to the slide rail position specified. (Command: `M21 G90`)
         
@@ -448,18 +437,18 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             Location of slide rail module.
         speed : int
             (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-        wait : bool
-            (Default value = `None`) Whether to wait for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.wait` instead.
+         : bool
+            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
 
         Returns
         -------
         msg : List[str] or bool
-            If `wait` is `True`, then return a list of strings which contains message output.
-            If `wait` is `False`, then return whether sending the message succeeded.
+            If `` is `True`, then return a list of strings which contains message output.
+            If `` is `False`, then return whether sending the message succeeded.
         """
 
         return super().go_to_axis(d=d,
-                                  speed=speed, wait=wait)
+                                  speed=speed, wait_ok=wait_ok)
     @property
     def pose(self):
         return self.cartesian

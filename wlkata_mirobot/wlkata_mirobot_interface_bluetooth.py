@@ -151,7 +151,7 @@ class BluetoothLowEnergyInterface:
 		""" Whether this class is connected to the Bluetooth Extender Box """
 		return self.connection
 
-	def send(self, msg, disable_debug=False, terminator=None, wait=True, wait_idle=True):
+	def send(self, msg, disable_debug=False, terminator=None, wait_ok=True, wait_idle=True):
 		"""
 
 		Send a message to the Bluetooth Extender Box. Shouldn't be used by the end user.
@@ -163,16 +163,16 @@ class BluetoothLowEnergyInterface:
 			 (Default value = False) Whether to disable debug statements on `idle`-state polling.
 		terminator : str
 			(Default value = `None`) Dummy variable for this method. This implementation will always use `\\r\\n` as the line terminator.
-		wait : bool
-			 (Default value = True) Whether to wait for the command to return a `ok` response.
+		 : bool
+			 (Default value = True) Whether to  for the command to return a `ok` response.
 		wait_idle :
-			 (Default value = True) Whether to wait for the Mirobot to be in an `Idle` state before returning.
+			 (Default value = True) Whether to  for the Mirobot to be in an `Idle` state before returning.
 
 		Returns
 		-------
 		msg : List[str] or bool
-			 If `wait` is `True`, then return a list of strings which contains message output.
-			 If `wait` is `False`, then return whether sending the message succeeded.
+			 If `` is `True`, then return a list of strings which contains message output.
+			 If `` is `False`, then return whether sending the message succeeded.
 
 		"""
 		self.feedback = []
@@ -221,7 +221,7 @@ class BluetoothLowEnergyInterface:
 				for c in self.characteristics:
 					await self.client.write_gatt_char(c, msg)
 
-			if wait:
+			if wait_ok:
 				for c in self.characteristics:
 					await self.client.start_notify(c, notification_handler)
 
@@ -231,7 +231,7 @@ class BluetoothLowEnergyInterface:
 			if self._debug and not disable_debug:
 				self.logger.debug(f"[SENT] {msg}")
 
-			if wait:
+			if wait_ok:
 				while self.ok_counter < 2:
 					# print('waiting...', msg, self.ok_counter)
 					await asyncio.sleep(0.1)
