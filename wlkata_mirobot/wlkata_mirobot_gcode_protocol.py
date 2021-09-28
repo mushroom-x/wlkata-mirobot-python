@@ -239,7 +239,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
             是否阻塞式等待，直到等到信息回读
         wait_idle : bool
             (Default value = `False`) Whether to wait for Mirobot to be idle before returning.
-            是否等待Mirbot转换为Idle空闲状态再发送指令
+            在结束的时候，等待IDLE状态才返回
         Returns
         -------
         msg : List[str] or bool
@@ -377,20 +377,54 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
                                               bool(motion_mode))
                 return True, return_status
             except Exception as exception:
-                # self.logger.exception(MirobotStatusError(f"Could not parse status message \"{msg}\" \n{str(exception)}"),
-                #                       exc_info=exception)
-                print(f"Could not parse status message \"{msg}\"")
+                self.logger.exception(MirobotStatusError(f"Could not parse status message \"{msg}\" \n{str(exception)}"),
+                                       exc_info=exception)
+                # print(f"Could not parse status message \"{msg}\"")
         else:
-            # self.logger.error(MirobotStatusError(f"Could not parse status message \"{msg}\""))
-            print(f"Could not parse status message \"{msg}\"")
+            self.logger.error(MirobotStatusError(f"Could not parse status message \"{msg}\""))
+            # print(f"Could not parse status message \"{msg}\"")
             
         return False, None
 
+    def home(self, wait=True, has_slider=False):
+        '''机械臂Homing'''
+        if has_slider:
+            return self.home_7axis(wait=wait)
+        else:
+            return self.home_6axis(wait=wait)
+    
+    def home_slider(self, wait=True):
+        '''滑台单独Homing'''
+        return self.home_1axis(7, wait=wait)
+    
+    def home_1axis(self, axis_id, wait=True):
+        '''单轴Homing'''
+        if not isinstance(axis_id, int) or not (axis_id >= 1 and axis_id <= 7):
+            return False
+        msg = f'$H{axis_id}'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+    
+    def home_6axis(self, wait=True):
+        '''六轴Homing'''
+        msg = f'$H'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+    
+    def home_6axis_in_turn(self, wait=True):
+        '''六轴Homing, 各关节依次Homing'''
+        msg = f'$HH'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+    
+    def home_7axis(self, wait=True):
+        '''七轴Homing(本体 + 滑台)'''
+        msg = f'$H0'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+        
     def home_individual(self, wait=None):
         """
+        [旧API, 不再使用]
         Home each axis individually. (Command: `$HH`)
         每个轴依次Homing, 耗时比较久
-
+        
         Parameters
         ----------
         wait : bool
@@ -404,12 +438,13 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         """
         msg = '$HH'
         return self.send_msg(msg, wait=wait, wait_idle=True)
-
+    
+    
     def home_simultaneous(self, wait=None):
         """
+        [旧API, 不再使用]
         Home all axes simultaneously. (Command:`$H`)
         机械臂多轴同时复位
-
         Parameters
         ----------
         wait : bool
@@ -426,6 +461,28 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         # 取消了homing之后需要等待Idle的约束
         return self.send_msg(msg, wait=wait, wait_idle=False)
 
+    def unlock_all_axis(self, wait=False):
+        '''接触各轴锁定状态'''
+        msg = 'M50'
+        return self.send_msg(msg, wait=wait, wait_idle=False)
+        
+    def go_to_zero(self, wait=True):
+        '''回零-运动到名义上的各轴零点'''
+        msg = '$M'
+        return self.send_msg(msg, wait=wait, wait_idle=True)
+    
+    def set_speed(self, speed, wait=False):
+        '''设置转速'''
+        # 转换为整数
+        speed = int(speed)
+        # 检查数值范围是否合法
+        if speed <= 0 or speed > 3000:
+            self.logger.error(MirobotStatusError(f"Illegal movement speed {speed}"))
+            return False
+        # 发送指令
+        msg = f'F{speed}'
+        return self.send_msg(msg, wait=wait, wait_idle=False)
+    
     def set_hard_limit(self, state, wait=None):
         """
         Set the hard limit state.
@@ -627,12 +684,10 @@ message
             If `wait` is `False`, then return whether sending the message succeeded.
         """
         instruction = 'M21 G91'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
-
         if not speed:
             speed = self.default_speed
         if speed:
             speed = int(speed)
-
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'D': d, 'F': speed}
         msg = self._generate_args_string(instruction, pairings)
 
@@ -801,24 +856,23 @@ message
         msg = self._generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
-
     
     def pump_suction(self):
         '''气泵吸气'''
-        self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) # 气泵吸气
+        self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) 
     
     def pump_blowing(self):
         '''气泵吹气'''
-        self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE) # 气泵吹气
+        self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE)
     
     def pump_on(self, is_suction=True):
         """
         气泵开启, 吸气/吹气
         """
         if is_suction:
-            self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) # 气泵吸气
+            self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE)
         else:
-            self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE) # 气泵吹气
+            self.set_air_pump(self.AIR_PUMP_BLOWING_PWM_VALUE) 
     
     def pump_off(self):
         """

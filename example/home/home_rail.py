@@ -1,5 +1,5 @@
 '''
-机械臂回归机械零点与状态查询
+机械臂回归机械零点与状态查询(带滑台版)
 '''
 from wlkata_mirobot import WlkataMirobot
 import time
@@ -9,8 +9,10 @@ arm = WlkataMirobot(portname='COM12', debug=False)
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
-arm.home(has_slider=False)
+arm.home_simultaneous(wait=True)
 print("机械臂Homing结束")
+
+# 滑台Homing
 
 # 状态更新与查询
 print("更新机械臂状态")
