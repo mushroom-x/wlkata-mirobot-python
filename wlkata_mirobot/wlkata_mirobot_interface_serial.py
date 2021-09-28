@@ -200,18 +200,9 @@ class WlkataMirobotInterfaceSerial:
             self.logger.exception(MirobotAmbiguousPort("No ports found! Make sure your Mirobot is connected and recognized by your operating system."))
         else:
             for p in port_objects:
-                if os_is_posix:
-                    try:
-                        open(p.device)
-                    except Exception:
-                        continue
-                    else:
-                        return p.device
-                else:
-                    self.logger.info(f"p.device:<{p.device}>")
-                    # TODO 尝试建立连接,发送指令， 看看能不能得到回传
-                    if self._is_mirobot_device(p.device):
-                        return p.device
+                # 尝试建立连接,发送指令， 看看能不能得到回传
+                if self._is_mirobot_device(p.device):
+                    return p.device
             self.logger.exception(MirobotAmbiguousPort("No open ports found! Make sure your Mirobot is connected and is not being used by another process."))
 
     def wait_for_ok(self, reset_expected=False, disable_debug=False):
