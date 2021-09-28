@@ -3,7 +3,7 @@
 '''
 from wlkata_mirobot import WlkataMirobot
 import time
-arm = WlkataMirobot(portname='COM12')
+arm = WlkataMirobot()
 arm.home()
 
 # 设置单个关节的角度

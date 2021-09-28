@@ -4,7 +4,7 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 
-arm = WlkataMirobot(portname='COM12')
+arm = WlkataMirobot()
 arm.home()
 
 # 气泵开启-吸气

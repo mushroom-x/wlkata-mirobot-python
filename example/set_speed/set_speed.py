@@ -4,7 +4,7 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 # 创建机械臂
-arm = WlkataMirobot(portname='COM12')
+arm = WlkataMirobot()
 # Homing
 arm.home()
 

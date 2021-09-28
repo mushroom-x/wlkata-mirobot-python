@@ -4,7 +4,7 @@
 import time
 from wlkata_mirobot import WlkataMirobot
 # 创建机械臂对象
-arm = WlkataMirobot(portname='COM12')
+arm = WlkataMirobot()
 # 机械臂回归零点
 arm.home()
 # 等待15s
