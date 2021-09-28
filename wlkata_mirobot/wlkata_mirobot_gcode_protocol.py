@@ -548,17 +548,16 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
         msg = 'M50'
         return self.send_msg(msg, wait=wait)
 
-    @staticmethod
-    def _format_float_value(value):
-        if vlaue is None:
+    def format_float_value(self, value):
+        if value is None:
             return value
         if isinstance(value, float):
             # 精确到小数点后两位数
             return round(value , 2)
         else:
             return value
-    @staticmethod
-    def _generate_args_string(instruction, pairings):
+    
+    def generate_args_string(self, instruction, pairings):
         """
         A helper methods to generate argument strings for the various movement instructions.
 
@@ -578,7 +577,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 message
             A string containing the base command followed by the correctly formatted arguments.
         """
-        args = [f'{arg_key}{self._format_float_value(value)}' for arg_key, value in pairings.items() if value is not None]
+        args = [f'{arg_key}{self.format_float_value(value)}' for arg_key, value in pairings.items() if value is not None]
 
         return ' '.join([instruction] + args)
     
@@ -648,7 +647,7 @@ message
             speed = int(speed)
 
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'D': d, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -689,7 +688,7 @@ message
         if speed:
             speed = int(speed)
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'D': d, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -730,7 +729,7 @@ message
             speed = int(speed)
 
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -771,7 +770,7 @@ message
             speed = int(speed)
 
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -812,7 +811,7 @@ message
             speed = int(speed)
 
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
 
@@ -853,7 +852,7 @@ message
             speed = int(speed)
 
         pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'F': speed}
-        msg = self._generate_args_string(instruction, pairings)
+        msg = self.generate_args_string(instruction, pairings)
 
         return self.send_msg(msg, wait=wait, wait_idle=True)
     

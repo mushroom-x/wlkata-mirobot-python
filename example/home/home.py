@@ -9,6 +9,9 @@ arm = WlkataMirobot(portname='COM12', debug=False)
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
+# 注: 
+# - 一般情况，在无第七轴的时候， 直接执行 arm.home() 即可, 参数has_slider默认为False。 
+# - 如有有滑台(第七轴), 将has_slider设置为True
 arm.home(has_slider=False)
 print("机械臂Homing结束")
 

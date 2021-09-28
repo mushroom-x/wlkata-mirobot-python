@@ -4,7 +4,7 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 # 创建机械臂
-arm = WlkataMirobot(portname='COM7', debug=True)
+arm = WlkataMirobot(portname='COM12', debug=False)
 # Homing
 arm.home_simultaneous()
 
@@ -21,3 +21,6 @@ time.sleep(1)
 print("运动到目标点 C, 指定末端的姿态角")
 arm.set_wrist_pose(150,  -20,  230, roll=30.0, pitch=0, yaw=45.0)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
+
+print("机械臂回零")
+arm.go_to_zero()
