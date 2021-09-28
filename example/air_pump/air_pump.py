@@ -4,8 +4,8 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 
-arm = WlkataMirobot(portname='COM12', debug=False)
-arm.home_simultaneous()
+arm = WlkataMirobot(portname='COM12')
+arm.home()
 
 # 气泵开启-吸气
 arm.pump_suction()

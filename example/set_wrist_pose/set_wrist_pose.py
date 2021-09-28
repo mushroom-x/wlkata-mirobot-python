@@ -4,9 +4,9 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 # 创建机械臂
-arm = WlkataMirobot(portname='COM12', debug=False)
+arm = WlkataMirobot(portname='COM12')
 # Homing
-arm.home_simultaneous()
+arm.home()
 
 print("运动到目标点 A")
 arm.set_wrist_pose(200,  20, 230)

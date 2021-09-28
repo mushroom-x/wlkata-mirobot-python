@@ -4,8 +4,8 @@
 from wlkata_mirobot import WlkataMirobot
 import time
 
-arm = WlkataMirobot(portname='COM12', debug=False)
-arm.home_simultaneous()
+arm = WlkataMirobot(portname='COM12')
+arm.home()
 
 # 设置爪子的间距
 spacing_mm = 20.0

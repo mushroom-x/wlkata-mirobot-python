@@ -125,7 +125,8 @@ class WlkataMirobotInterfaceSerial:
         cache_msg = self.empty_cache()
         if self._debug and not disable_debug:
             # 将缓冲数据打印出来
-            self.logger.debug(f"[RECV CACHE] {cache_msg}")
+            if len(cache_msg) != 0:
+                self.logger.debug(f"[RECV CACHE] {cache_msg}")
     
         output = self.serial_device.send(msg, terminator=terminator)
         
@@ -237,8 +238,8 @@ class WlkataMirobotInterfaceSerial:
             msg = self.serial_device.readline(timeout=0.1)
             # 调试, 打印接收的消息
             if self._debug and not disable_debug:
-                self.logger.debug(f"[RECV] {msg}")
-            
+                if len(msg) != 0:
+                    self.logger.debug(f"[RECV] {msg}")
             # 异常情况判断
             if 'error' in msg:
                 self.logger.error(MirobotError(msg.replace('error: ', '')))

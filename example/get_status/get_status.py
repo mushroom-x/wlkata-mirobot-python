@@ -1,13 +1,12 @@
 '''
 获取机械臂的状态
 '''
-from wlkata_mirobot import WlkataMirobot
 import time
-arm = WlkataMirobot(portname='COM7', debug=False)
-
-# 注:一定要配置为wait=False,非阻塞式等待
-# 要不然会卡死
-arm.home_simultaneous(wait=False)
+from wlkata_mirobot import WlkataMirobot
+# 创建机械臂对象
+arm = WlkataMirobot(portname='COM12')
+# 机械臂回归零点
+arm.home()
 # 等待15s
 time.sleep(15)
 # 打印机械臂当前的状态

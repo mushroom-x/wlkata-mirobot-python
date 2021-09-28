@@ -1,18 +1,21 @@
 '''
-机械臂回归机械零点与状态查询(带滑台版)
+机械臂回归机械零点与状态查询
 '''
 from wlkata_mirobot import WlkataMirobot
 import time
 
 print("实例化Mirobot机械臂实例")
-arm = WlkataMirobot(portname='COM12', debug=False)
+arm = WlkataMirobot(portname='COM12')
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
-arm.home_simultaneous(wait=True)
+# 注: 
+# - 一般情况，在无第七轴的时候， 直接执行 arm.home() 即可, 参数has_slider默认为False。 
+# - 如有有滑台(第七轴), 将has_slider设置为True
+arm.home()
+# arm.home(has_slider=False)
+# arm.home(has_slider=True)
 print("机械臂Homing结束")
-
-# 滑台Homing
 
 # 状态更新与查询
 print("更新机械臂状态")
