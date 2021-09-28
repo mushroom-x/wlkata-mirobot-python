@@ -1,6 +1,6 @@
 """
-Mirobot串口设备对象
-- 根据Mirobot串口通信的配置在serial的外层封装了一层。目的是可以让蓝牙设备跟串口设备共享同一套API。 
+串口设备对象
+- 在serial的外层封装了一层。目的是可以让蓝牙设备跟串口设备共享同一套API。 
 """
 import logging
 import os
@@ -13,13 +13,13 @@ from .wlkata_mirobot_exceptions import ExitOnExceptionStreamHandler, SerialDevic
 # posix: 类Unix 操作系统的可移植API
 os_is_posix = os.name == 'posix'
 
-class WlkataMirobotDeviceSerial:
+class DeviceSerial:
     """
     A class for establishing a connection to a serial device. 
     Mirobot串口设备
     """
     def __init__(self, portname='', baudrate=0, stopbits=1, timeout=0.2, exclusive=False, debug=False):
-        """ Initialization of `WlkataMirobotDeviceSerial` class
+        """ Initialization of `DeviceSerial` class
         串口设备初始化
 
         Parameters
@@ -40,7 +40,7 @@ class WlkataMirobotDeviceSerial:
             调试开关
         Returns
         -------
-        class : WlkataMirobotDeviceSerial 串口设备
+        class : DeviceSerial 串口设备
 
         """
         self.portname = str(portname)
@@ -76,19 +76,19 @@ class WlkataMirobotDeviceSerial:
 
     @property
     def debug(self):
-        """ Return the `debug` property of `WlkataMirobotDeviceSerial` """
+        """ Return the `debug` property of `DeviceSerial` """
         return self._debug
 
     @debug.setter
     def debug(self, value):
         """
-        Set the new `debug` property of `WlkataMirobotDeviceSerial`. Use as in `WlkataMirobotDeviceSerial.setDebug(value)`.
+        Set the new `debug` property of `DeviceSerial`. Use as in `DeviceSerial.setDebug(value)`.
         配置调试开关
         
         Parameters
         ----------
         value : bool
-            The new value for `WlkataMirobotDeviceSerial.debug`. User this setter method as it will also update the logging method. As opposed to setting `WlkataMirobotDeviceSerial.debug` directly which will not update the logger.
+            The new value for `DeviceSerial.debug`. User this setter method as it will also update the logging method. As opposed to setting `DeviceSerial.debug` directly which will not update the logger.
         """
         self._debug = bool(value)
         self.stream_handler.setLevel(logging.DEBUG if self._debug else logging.INFO)
@@ -155,10 +155,10 @@ class WlkataMirobotDeviceSerial:
                 self.serialport.open()
                 self._is_open = True
                 self.logger.debug(f"- Succeeded in opening serial port {self.portname}")
-
+                return True
             except Exception as e:
                 self.logger.exception(SerialDeviceOpenError(e))
-
+                return False
     def close(self):
         """ 
         Close the serial port.

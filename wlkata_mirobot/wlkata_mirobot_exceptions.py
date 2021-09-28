@@ -67,28 +67,28 @@ class MirobotAmbiguousPort(Exception):
 
 class SerialDeviceReadError(Exception):
     """ 
-    An inplace class for when WlkataMirobotDeviceSerial is unable to read the serial port
+    An inplace class for when DeviceSerial is unable to read the serial port
     串口设备读取异常
     """
     pass
 
 class SerialDeviceOpenError(Exception):
     """ 
-    An inplace class for when WlkataMirobotDeviceSerial is unable to open the serial port 
+    An inplace class for when DeviceSerial is unable to open the serial port 
     串口设备打开异常
     """
     pass
 
 class SerialDeviceCloseError(Exception):
     """ 
-    An inplace class for when WlkataMirobotDeviceSerial is unable to close the serial port 
+    An inplace class for when DeviceSerial is unable to close the serial port 
     串口设备关闭错误
     """
     pass
 
 class SerialDeviceWriteError(Exception):
     """ 
-    An inplace class for when WlkataMirobotDeviceSerial is unable to write to the serial port 
+    An inplace class for when DeviceSerial is unable to write to the serial port 
     串口写入错误
     """
     pass

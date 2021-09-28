@@ -18,7 +18,7 @@ except ImportError:
 	# Try backported to PY<37 `importlib_resources`.
 	import importlib_resources as pkg_resources
 
-from .wlkata_mirobot_interface_bluetooth import BluetoothLowEnergyInterface
+# from .wlkata_mirobot_interface_bluetooth import BluetoothLowEnergyInterface
 from .wlkata_mirobot_interface_serial import WlkataMirobotInterfaceSerial
 from .wlkata_mirobot_status import MirobotStatus, MirobotAngles, MirobotCartesians
 from .wlkata_mirobot_exceptions import ExitOnExceptionStreamHandler, MirobotError, MirobotAlarm, MirobotReset, MirobotAmbiguousPort, MirobotStatusError, MirobotResetFileError, MirobotVariableCommandError
@@ -57,11 +57,11 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 		"""
 		Initialization of the `WlkataMirobotGcodeProtocol` class.
 		初始化`WlkataMirobotGcodeProtocol`类
-
+		
 		Parameters
 		----------
 		*device_args : Any
-			 Arguments that are passed into the `mirobot.serial_device.WlkataMirobotDeviceSerial` or `mirobot.wlkata_mirobot_interface_bluetooth.BluetoothLowEnergyInterface` class.
+			 Arguments that are passed into the `mirobot.serial_device.DeviceSerial` or `mirobot.wlkata_mirobot_interface_bluetooth.BluetoothLowEnergyInterface` class.
 		debug : bool
 			(Default value = `False`) Whether to print gcode input and output to STDOUT. Stored in `WlkataMirobotGcodeProtocol.debug`.
 		connection_type : str
@@ -84,7 +84,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 		wait_ok : bool
 			(Default value = `True`) Whether to wait_ok for commands to return a status signifying execution has finished. Turns all move-commands into blocking function calls. Stored `WlkataMirobotGcodeProtocol.wait_ok`.
 		**device_kwargs : Any
-			 Keywords that are passed into the `mirobot.serial_device.WlkataMirobotDeviceSerial` or `mirobot.wlkata_mirobot_interface_bluetooth.BluetoothLowEnergyInterface` class.
+			 Keywords that are passed into the `mirobot.serial_device.DeviceSerial` or `mirobot.wlkata_mirobot_interface_bluetooth.BluetoothLowEnergyInterface` class.
 
 		Returns
 		-------
@@ -103,7 +103,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 
 		self.device = None
 		""" Object that controls the connection to the Mirobot. Can either be a `mirobot.serial_interface.WlkataMirobotInterfaceSerial` or `mirobot.wlkata_mirobot_interface_bluetooth.BluetoothLowEnergyInterface` class."""
-		# Parse inputs into WlkataMirobotDeviceSerial
+		# Parse inputs into DeviceSerial
 		if connection_type.lower() in ('serial', 'ser'):
 			# 创建串口连接
 			serial_device_init_fn = WlkataMirobotInterfaceSerial.__init__
@@ -116,26 +116,25 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 			args_dict['debug'] = debug
 			args_dict['logger'] = self.logger
 			args_dict['autofindport'] = autofindport
-
 			# 设置设备为串口接口
 			self.device = WlkataMirobotInterfaceSerial(**args_dict)
 			# 设置端口名称
 			self.default_portname = self.device.default_portname
 
-		elif connection_type.lower() in ('bluetooth', 'bt'):
-			# 创建蓝牙连接
-			bluetooth_device_init_fn = BluetoothLowEnergyInterface.__init__
-			args_names = bluetooth_device_init_fn.__code__.co_varnames[:bluetooth_device_init_fn.__code__.co_argcount]
-			args_dict = dict(zip(args_names, device_args))
-			args_dict.update(device_kwargs)
+		# elif connection_type.lower() in ('bluetooth', 'bt'):
+		# 	# 创建蓝牙连接
+		# 	bluetooth_device_init_fn = BluetoothLowEnergyInterface.__init__
+		# 	args_names = bluetooth_device_init_fn.__code__.co_varnames[:bluetooth_device_init_fn.__code__.co_argcount]
+		# 	args_dict = dict(zip(args_names, device_args))
+		# 	args_dict.update(device_kwargs)
 
-			args_dict['mirobot'] = self
-			args_dict['debug'] = debug
-			args_dict['logger'] = self.logger
-			args_dict['autofindaddress'] = autofindport
+		# 	args_dict['mirobot'] = self
+		# 	args_dict['debug'] = debug
+		# 	args_dict['logger'] = self.logger
+		# 	args_dict['autofindaddress'] = autofindport
 
-			self.device = BluetoothLowEnergyInterface(**args_dict)
-			self.default_portname = self.device.address
+		# 	self.device = BluetoothLowEnergyInterface(**args_dict)
+		# 	self.default_portname = self.device.address
 
 		formatter = logging.Formatter(f"[{self.default_portname}] [%(levelname)s] %(message)s")
 		self.stream_handler.setFormatter(formatter)
@@ -205,7 +204,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 	def debug(self, value):
 		"""
 		Set the new value for the `debug` property of `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol`. Use as in `WlkataMirobotGcodeProtocol.setDebug(value)`.
-		Use this setter method as it will also update the logging objects of `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and its `mirobot.serial_device.WlkataMirobotDeviceSerial`. As opposed to setting `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol._debug` directly which will not update the loggers.
+		Use this setter method as it will also update the logging objects of `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and its `mirobot.serial_device.DeviceSerial`. As opposed to setting `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol._debug` directly which will not update the loggers.
 
 		Parameters
 		----------

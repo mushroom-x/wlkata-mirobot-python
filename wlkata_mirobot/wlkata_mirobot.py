@@ -22,7 +22,6 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
     """
     Wlkata Mirobot 机械臂Python SDK, 提供给用户使用。
     """
-
     def __init__(self, *base_mirobot_args, **base_mirobot_kwargs):
         """
         Initialization of the `Mirobot` class.

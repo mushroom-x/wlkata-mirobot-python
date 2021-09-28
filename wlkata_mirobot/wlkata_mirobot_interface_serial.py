@@ -3,10 +3,11 @@ Mirobot串口通信协议/接口
 """
 import os
 import time
+import serial
 # 使用pyserial的串口设备列表查看器
 import serial.tools.list_ports as lp
 # 串口设备
-from .wlkata_mirobot_device_serial import WlkataMirobotDeviceSerial
+from .wlkata_mirobot_device_serial import DeviceSerial
 # 异常
 from .wlkata_mirobot_exceptions import MirobotError, MirobotAlarm, MirobotReset, MirobotAmbiguousPort
 
@@ -18,7 +19,7 @@ os_is_nt = os.name == 'nt'
 os_is_posix = os.name == 'posix'
 
 class WlkataMirobotInterfaceSerial:
-    """ A class for bridging the interface between `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and `mirobot.serial_device.WlkataMirobotDeviceSerial`"""
+    """ A class for bridging the interface between `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and `mirobot.serial_device.DeviceSerial`"""
     def __init__(self, mirobot, portname=None, baudrate=None, stopbits=None, exclusive=True, debug=False, logger=None, autofindport=True):
         """ Initialization of `WlkataMirobotInterfaceSerial` class
 
@@ -74,7 +75,7 @@ class WlkataMirobotInterfaceSerial:
             # 设置端口号
             self.default_portname = portname
 
-        self.serial_device = WlkataMirobotDeviceSerial(**serial_device_kwargs)
+        self.serial_device = DeviceSerial(**serial_device_kwargs)
 
     @property
     def debug(self):
@@ -85,7 +86,7 @@ class WlkataMirobotInterfaceSerial:
     def debug(self, value):
         """
         Set the new value for the `debug` property of `mirobot.serial_interface.WlkataMirobotInterfaceSerial`. Use as in `WlkataMirobotGcodeProtocol.setDebug(value)`.
-        Use this setter method as it will also update the logging objects of `mirobot.serial_interface.WlkataMirobotInterfaceSerial` and its `mirobot.serial_device.WlkataMirobotDeviceSerial`. As opposed to setting `mirobot.serial_interface.WlkataMirobotInterfaceSerial._debug` directly which will not update the loggers.
+        Use this setter method as it will also update the logging objects of `mirobot.serial_interface.WlkataMirobotInterfaceSerial` and its `mirobot.serial_device.DeviceSerial`. As opposed to setting `mirobot.serial_interface.WlkataMirobotInterfaceSerial._debug` directly which will not update the loggers.
         
         Parameters
         ----------
@@ -158,7 +159,30 @@ class WlkataMirobotInterfaceSerial:
             Whether the Mirobot is connected.
         """
         return self.serial_device.is_open
-
+    
+    def _is_mirobot_device(self, portname):
+        # device = DeviceSerial(portname=portname)
+        self.logger.info(f"尝试打开串口 {portname}")
+        # 尝试打开设备
+        try:
+            device=serial.Serial(portname, 115200, timeout=0.1)
+        except Exception as e:
+            self.logger.error(e)
+            return False
+        
+        if not device.isOpen():
+            self.logger.error("Serial is not open")
+            return False
+        device.write("?\n".encode("utf-8"))
+        time.sleep(1)
+        # 读入所有字符，查看 'WLKATA'是否在接收的字符串里面
+        recv_str = device.readall().decode('utf-8')
+        self.logger.info(f"[RECV] {recv_str}")
+        is_mirobot = 'WLKATA' in recv_str
+        # 关闭设备
+        device.close()
+        return is_mirobot
+    
     def _find_portname(self):
         """
         Find the port that might potentially be connected to the Mirobot.
@@ -174,7 +198,6 @@ class WlkataMirobotInterfaceSerial:
 
         if not port_objects:
             self.logger.exception(MirobotAmbiguousPort("No ports found! Make sure your Mirobot is connected and recognized by your operating system."))
-
         else:
             for p in port_objects:
                 if os_is_posix:
@@ -185,8 +208,10 @@ class WlkataMirobotInterfaceSerial:
                     else:
                         return p.device
                 else:
-                    return p.device
-
+                    self.logger.info(f"p.device:<{p.device}>")
+                    # TODO 尝试建立连接,发送指令， 看看能不能得到回传
+                    if self._is_mirobot_device(p.device):
+                        return p.device
             self.logger.exception(MirobotAmbiguousPort("No open ports found! Make sure your Mirobot is connected and is not being used by another process."))
 
     def wait_for_ok(self, reset_expected=False, disable_debug=False):
@@ -282,7 +307,6 @@ class WlkataMirobotInterfaceSerial:
         """
         # 更新一下当前Mirobot的状态
         self.mirobot.get_status(disable_debug=True)
-        # self.mirobot.update_status(disable_debug=False)
         while self.mirobot.status is None or self.mirobot.status.state != 'Idle':
             time.sleep(refresh_rate)
             # 不断的发送状态查询, 更新状态
