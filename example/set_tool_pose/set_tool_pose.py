@@ -11,16 +11,18 @@ arm.home()
 print("运动到目标点 A")
 arm.set_tool_pose(200,  20, 230)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
-time.sleep(1)
+time.sleep(2)
+
 
 print("运动到目标点 B")
 arm.set_tool_pose(200,  20, 150)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
-time.sleep(1)
+time.sleep(2)
 
 print("运动到目标点 C, 指定末端的姿态角")
 arm.set_tool_pose(150,  -20,  230, roll=30.0, pitch=0, yaw=45.0)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
+time.sleep(2)
 
 print("机械臂回零")
 arm.go_to_zero()
