@@ -453,6 +453,26 @@ class WlkataMirobot(AbstractContextManager):
 		msg = self.generate_args_string(instruction, pairings)
 		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
 	
+	def set_door_lift_distance(self, lift_distance):
+		'''设置门式轨迹规划抬起的高度'''
+		msg = f"$49={lift_distance}"
+		return self.send_msg(msg, wait_ok=True, wait_idle=True)
+
+	def door_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
+		'''门式插补'''
+		instruction = 'M20 G90 G05'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
+		if is_relative:
+			instruction = 'M20 G91 G05'
+		
+		if not speed:
+			speed = self.default_speed
+		if speed:
+			speed = int(speed)
+
+		pairings = {'X': x, 'Y': y, 'Z': z, 'A': a, 'B': b, 'C': c, 'F': speed}
+		msg = self.generate_args_string(instruction, pairings)
+		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
+
 	def set_tool_type(self, tool, wait_ok=True):
 		'''选择工具类型'''
 		self.tool = tool
