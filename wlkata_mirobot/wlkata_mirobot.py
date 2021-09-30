@@ -402,7 +402,8 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
             self.logger.warn(f"Illegal slider range {slider_length} mm")
             return False
         msg = f''
-        
+    
+    
     def increment_slide_rail(self, d, speed=None, wait_ok=None):
         """
         Increment slide rail position a specified amount. (Command: `M21 G91`)
@@ -426,6 +427,11 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         return super().increment_axis(d=d,
                                       speed=speed, wait_ok=wait_ok)
 
+    def set_slider_posi(self, d, speed=None, wait_ok=True):
+        '''设置滑台位置, 单位mm'''
+        return super().go_to_axis(d=d,
+                                  speed=speed, wait_ok=wait_ok)
+    
     def go_to_slide_rail(self, d, speed=None, wait_ok=None):
         """
         Go to the slide rail position specified. (Command: `M21 G90`)

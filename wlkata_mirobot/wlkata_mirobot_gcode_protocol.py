@@ -263,6 +263,7 @@ class WlkataMirobotGcodeProtocol(AbstractContextManager):
 			if wait_ok is None:
 				wait_ok = False
 			
+			# print(f"send_msg wait_ok = {wait_ok}")
 			# actually send the message
 			# 返回值是布尔值，代表是否正确发送
 			ret = self.device.send(msg,
@@ -569,7 +570,7 @@ message
 		return self.go_to_axis(x=joint_angles[1], y=joint_angles[2], z=joint_angles[3], a=joint_angles[4], \
 			b=joint_angles[5], c=joint_angles[6], d=joint_angles[7], speed=speed, wait_ok=wait_ok)
 
-	def go_to_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait_ok=None):
+	def go_to_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, wait_ok=True):
 		"""
 		Send all axes to a specific position in angular coordinates. (Command: `M21 G90`)
 
