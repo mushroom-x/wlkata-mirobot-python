@@ -30,3 +30,10 @@ time.sleep(2)
 
 print('设置滑台的位置 100mm')
 arm.set_slider_posi(100)
+
+print('设置滑台的位置 相对移动 +50mm')
+arm.set_slider_posi(50, is_relative=True)
+
+# 更新机械臂的状态
+arm.get_status()
+print(f"当前的滑台的位置 :{arm.slider} mm")

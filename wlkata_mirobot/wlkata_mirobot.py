@@ -40,36 +40,7 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
 
         """
         super().__init__(*base_mirobot_args, **base_mirobot_kwargs)
-
-        # self._rover = MirobotEndRelativeMotion(self)
-
-        self.move = dim_splitter(cartesian=cartesian_type_splitter(ptp=self.go_to_cartesian_ptp,
-                                                                   lin=self.go_to_cartesian_lin),
-                                 angle=self.go_to_axis,
-                                 rail=self.go_to_slide_rail)
-        """ The root of the move alias. Uses `go_to_...` methods. Can be used as `mirobot.move.ptp(...)` or `mirobot.move.angle(...)` """
-
-        self.increment = dim_splitter(cartesian=cartesian_type_splitter(ptp=self.increment_cartesian_ptp,
-                                                                        lin=self.increment_cartesian_lin),
-                                      angle=self.increment_axis,
-                                      rail=self.increment_slide_rail)
-        # """ The root of the increment alias. Uses `increment_...` methods. Can be used as `mirobot.increment.ptp(...)` or `mirobot.increment.angle(...)` """
-        # self.wheel = four_way_splitter(upper=left_right_splitter(left=self._rover.move_upper_left,
-        #                                                          right=self._rover.move_upper_right),
-        #                                lower=left_right_splitter(left=self._rover.move_bottom_left,
-        #                                                          right=self._rover.move_bottom_right),
-        #                                left=upper_lower_splitter(upper=self._rover.move_upper_left,
-        #                                                          lower=self._rover.move_bottom_left),
-        #                                right=upper_lower_splitter(upper=self._rover.move_upper_right,
-        #                                                           lower=self._rover.move_bottom_right))
-
-        # self.rover = rover_splitter(wheel=self.wheel,
-        #                             rotate=left_right_splitter(left=self._rover.rotate_left,
-        #                                                        right=self._rover.rotate_right),
-        #                             move=forward_backward_splitter(forward=self._rover.move_forward,
-        #                                                            backward=self._rover.move_backward))
-        # """ The root of the rover alias. Uses methods from `mirobot.base_rover.BaseRover`. Can be used as `mirobot.rover.wheel.upper.right(...)` or `mirobot.rover.rotate.left(...)` or `mirobot.rover.move.forward(...)`"""
-
+    
     @property
     def state(self):
         """ 
@@ -91,7 +62,7 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         return self.status.angle
 
     @property
-    def rail(self):
+    def slider(self):
         """ 
         Location of external slide rail module 
         获取滑台(Mirobot第七轴)的位置
@@ -395,65 +366,16 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         return super().increment_axis(**inputs,
                                       speed=speed, wait_ok=wait_ok)
 
-    def set_slider_range(self, slider_length):
-        '''设置滑台的范围'''
-        self.slider_length = slider_length
-        if slider_length <= 0:
-            self.logger.warn(f"Illegal slider range {slider_length} mm")
-            return False
-        msg = f''
-    
-    
-    def increment_slide_rail(self, d, speed=None, wait_ok=None):
-        """
-        Increment slide rail position a specified amount. (Command: `M21 G91`)
 
-        Parameters
-        ----------
-        d : float
-            Location of slide rail module.
-        speed : int
-            (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-         : bool
-            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
-
-        Returns
-        -------
-        msg : List[str] or bool
-            If `` is `True`, then return a list of strings which contains message output.
-            If `` is `False`, then return whether sending the message succeeded.
-        """
-
-        return super().increment_axis(d=d,
-                                      speed=speed, wait_ok=wait_ok)
-
-    def set_slider_posi(self, d, speed=None, wait_ok=True):
+    def set_slider_posi(self, d, speed=None, is_relative=False, wait_ok=True):
         '''设置滑台位置, 单位mm'''
-        return super().go_to_axis(d=d,
-                                  speed=speed, wait_ok=wait_ok)
+        if not is_relative:
+            return super().go_to_axis(d=d,
+                                    speed=speed, wait_ok=wait_ok)
+        else:
+            return super().increment_axis(d=d,
+                                      speed=speed, wait_ok=wait_ok)
     
-    def go_to_slide_rail(self, d, speed=None, wait_ok=None):
-        """
-        Go to the slide rail position specified. (Command: `M21 G90`)
-        
-        Parameters
-        ----------
-        d : float
-            Location of slide rail module.
-        speed : int
-            (Default value = `None`) The speed in which the Mirobot moves during this operation. (mm/s)
-         : bool
-            (Default value = `None`) Whether to  for output to return from the Mirobot before returning from the function. This value determines if the function will block until the operation recieves feedback. If `None`, use class default `WlkataMirobotGcodeProtocol.` instead.
-
-        Returns
-        -------
-        msg : List[str] or bool
-            If `` is `True`, then return a list of strings which contains message output.
-            If `` is `False`, then return whether sending the message succeeded.
-        """
-
-        return super().go_to_axis(d=d,
-                                  speed=speed, wait_ok=wait_ok)
     @property
     def pose(self):
         return self.cartesian
