@@ -394,15 +394,15 @@ class WlkataMirobot(AbstractContextManager):
 		'''设置工具位姿'''
 		if mode == "p2p":
 			# 点控模式 Point To Point
-			self.ptp_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
+			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
 		elif mode == "linear":
 			# 直线插补 Linera Interpolation
 			self.linear_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
 		else:
 			# 默认是点到点
-			self.ptp_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
+			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
    
-	def ptp_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
+	def p2p_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
 		'''点到点插补'''
 		instruction = 'M20 G90 G0'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
 		if is_relative:
@@ -432,13 +432,13 @@ class WlkataMirobot(AbstractContextManager):
 		msg = self.generate_args_string(instruction, pairings)
 		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
 	
-	def circular_interpolation(self, e_x, e_y, radius, is_cw=True, speed=None, wait_ok=None):
+	def circular_interpolation(self, ex, ey, radius, is_cw=True, speed=None, wait_ok=None):
 		'''圆弧插补
   		在XY平面上, 从当前点运动到相对坐标(ex, ey).半径为radius
 		`is_cw`决定圆弧是顺时针还是逆时针.
 		'''
 		# 判断是否合法
-		distance = math.sqrt(e_x**2 + e_y**2)
+		distance = math.sqrt(ex**2 + ey**2)
 		if distance > (radius * 2):
 			self.logger.error(f'circular interpolation error, target posi is too far')
 			return False
@@ -449,7 +449,7 @@ class WlkataMirobot(AbstractContextManager):
 		else:
 			instruction = 'M20 G91 G03'
 		
-		pairings = {'X': x, 'Y': y, 'R': radius, 'F': speed}
+		pairings = {'X': ex, 'Y': ey, 'R': radius, 'F': speed}
 		msg = self.generate_args_string(instruction, pairings)
 		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
 	
