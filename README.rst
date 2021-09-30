@@ -39,15 +39,15 @@ Quick Start
    arm.home_simultaneous()
 
    print("Move to point A (x, y, z)")
-   arm.set_wrist_pose(200,  20, 230)
+   arm.set_tool_pose(200,  20, 230)
    print(f"Current robot arm end pose:  {arm.pose}")
    time.sleep(1)
 
    print("Move to point B (x, y, z)")
-   arm.set_wrist_pose(200,  20, 150)
+   arm.set_tool_pose(200,  20, 150)
    print(f"Current robot arm end pose: {arm.pose}")
    time.sleep(1)
 
    print("Move to point C (x, y, z, roll, pitch, yaw)")
-   arm.set_wrist_pose(150,  -20,  230, roll=30.0, pitch=0, yaw=45.0)
+   arm.set_tool_pose(150,  -20,  230, roll=30.0, pitch=0, yaw=45.0)
    print(f"Current robot arm end pose {arm.pose}")

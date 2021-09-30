@@ -47,6 +47,8 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
 
         """
         super().__init__(*base_mirobot_args, **base_mirobot_kwargs)        
+        self.tool = WlkataMirobotTool.NO_TOOL
+    
     @property
     def state(self):
         """ 
