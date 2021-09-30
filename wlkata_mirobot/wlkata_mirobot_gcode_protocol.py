@@ -817,6 +817,26 @@ message
 
 		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
 	
+	def set_tool_type(self, tool_id, wait_ok=True):
+		if type(tool_id) != int or not (tool_id >= 0 and tool_id <= 3):
+			self.logger.error(f"Unkown tool id {tool_id}")
+			return False
+		msg = f'$50={tool_id}'
+		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
+
+	def set_tool_offset(self, offset_x, offset_y, offset_z, wait_ok=True):
+		'''设置工具坐标系的偏移量'''
+		# 设置末端x轴偏移量
+		msg = f"$46={offset_x}"
+		ret_x = self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
+		# 设置末端y轴偏移量
+		msg = f"$47={offset_y}"
+		ret_y = self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
+		# 设置末端z轴偏移量
+		msg = f"$48={offset_z}"
+		ret_z = self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
+		return ret_x and ret_y and ret_z
+
 	def pump_suction(self):
 		'''气泵吸气'''
 		self.set_air_pump(self.AIR_PUMP_SUCTION_PWM_VALUE) 

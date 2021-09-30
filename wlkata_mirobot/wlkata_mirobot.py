@@ -3,20 +3,27 @@ Mirobot主类
 """
 import math
 from collections import namedtuple
+from enum import Enum
 from typing import NamedTuple
 
 from .wlkata_mirobot_gcode_protocol import WlkataMirobotGcodeProtocol
 # from .wlkata_mirobot_end_relative_motion import MirobotEndRelativeMotion
 from .wlkata_mirobot_status import MirobotAngles, MirobotCartesians
 
-dim_splitter: NamedTuple = namedtuple('dim_spliter', ['cartesian', 'angle', 'rail'])
-cartesian_type_splitter: NamedTuple = namedtuple('cartesian_type_splitter', ['ptp', 'lin'])
-left_right_splitter: NamedTuple = namedtuple('left_right_splitter', ['left', 'right'])
-upper_lower_splitter: NamedTuple = namedtuple('upper_lower_splitter', ['upper', 'lower'])
-four_way_splitter: NamedTuple = namedtuple('four_way_splitter', ['left', 'right', 'upper', 'lower'])
-forward_backward_splitter: NamedTuple = namedtuple('forward_backward_splitter', ['forward', 'backward'])
-rover_splitter: NamedTuple = namedtuple('rover_splitter', ['wheel', 'rotate', 'move'])
+# # dim_splitter: NamedTuple = namedtuple('dim_spliter', ['cartesian', 'angle', 'rail'])
+# # cartesian_type_splitter: NamedTuple = namedtuple('cartesian_type_splitter', ['ptp', 'lin'])
+# left_right_splitter: NamedTuple = namedtuple('left_right_splitter', ['left', 'right'])
+# upper_lower_splitter: NamedTuple = namedtuple('upper_lower_splitter', ['upper', 'lower'])
+# four_way_splitter: NamedTuple = namedtuple('four_way_splitter', ['left', 'right', 'upper', 'lower'])
+# forward_backward_splitter: NamedTuple = namedtuple('forward_backward_splitter', ['forward', 'backward'])
+# rover_splitter: NamedTuple = namedtuple('rover_splitter', ['wheel', 'rotate', 'move'])
 
+
+class WlkataMirobotTool(Enum):
+    NO_TOOL = 0         # 没有工具
+    SUCTION_CUP = 1     # 气泵吸头
+    GRIPPER = 2         # 舵机爪子
+    FLEXIBLE_CLAW = 3   # 三指柔爪
 
 class WlkataMirobot(WlkataMirobotGcodeProtocol):
     """
@@ -39,8 +46,7 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
         class : `Mirobot`
 
         """
-        super().__init__(*base_mirobot_args, **base_mirobot_kwargs)
-    
+        super().__init__(*base_mirobot_args, **base_mirobot_kwargs)        
     @property
     def state(self):
         """ 
@@ -123,10 +129,18 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
 
         return super().go_to_cartesian_lin(**inputs,
                                            speed=speed, wait_ok=wait_ok)
-    def set_wrist_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait_ok=None):
+    def set_tool_type(self, tool):
+        '''选择末端工具'''
+        self.tool = tool
+        self.logger.info(f"Change Tool : {tool.name}")
+        # 获取工具的ID
+        tool_id = tool.value
+        # 发送指令
+        super().set_tool_type(tool_id)
+        
+    def set_tool_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait_ok=None):
         """
-        设置腕关节的位姿
-
+        设置工具的位姿
         Parameters
         ----------
         x : float
@@ -365,7 +379,6 @@ class WlkataMirobot(WlkataMirobotGcodeProtocol):
 
         return super().increment_axis(**inputs,
                                       speed=speed, wait_ok=wait_ok)
-
 
     def set_slider_posi(self, d, speed=None, is_relative=False, wait_ok=True):
         '''设置滑台位置, 单位mm'''

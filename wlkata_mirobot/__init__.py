@@ -1,4 +1,4 @@
-from .wlkata_mirobot import WlkataMirobot
+from .wlkata_mirobot import WlkataMirobot, WlkataMirobotTool
 from .wlkata_mirobot_status import MirobotStatus, MirobotAngles, MirobotCartesians
 
 # don't document our resources directory duh
