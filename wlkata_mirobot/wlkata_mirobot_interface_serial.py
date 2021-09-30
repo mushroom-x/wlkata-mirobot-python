@@ -7,7 +7,7 @@ import serial
 # 使用pyserial的串口设备列表查看器
 import serial.tools.list_ports as lp
 # 串口设备
-from .wlkata_mirobot_device_serial import DeviceSerial
+from .device_serial import DeviceSerial
 # 异常
 from .wlkata_mirobot_exceptions import MirobotError, MirobotAlarm, MirobotReset, MirobotAmbiguousPort
 

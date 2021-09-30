@@ -1,5 +1,5 @@
 '''
-机械臂腕关节的位置控制, 点控 point to point
+机械臂工具位姿控制, 点控 point to point
 '''
 from wlkata_mirobot import WlkataMirobot
 import time

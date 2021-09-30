@@ -1,5 +1,5 @@
 '''
-气泵控制
+机械臂爪相关API测试
 '''
 from wlkata_mirobot import WlkataMirobot
 import time
