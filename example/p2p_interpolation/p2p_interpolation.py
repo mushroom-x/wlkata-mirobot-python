@@ -10,12 +10,14 @@ arm = WlkataMirobot()
 arm.home()
 
 print("运动到目标点 A")
-arm.set_tool_pose(100,  100, 150, mode="p2p")
+arm.p2p_interpolation(100,  100, 150)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
 time.sleep(2)
 
 
 print("运动到目标点 B")
-arm.set_tool_pose(100,  -100, 150, mode="p2p")
+x, y, z = 100,  -100, 150
+roll, pitch, yaw = 30.0, 0, 45.0
+arm.p2p_interpolation(x, y, z, roll, pitch, yaw)
 print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
 time.sleep(2)

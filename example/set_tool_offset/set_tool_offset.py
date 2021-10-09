@@ -23,7 +23,6 @@ print(f"机械臂工具位姿: {arm.cartesian}")
 offset_x = 0
 offset_y = 0
 offset_z = -20.0
-
 print(f'手动设置工具坐标系的偏移量 ({offset_x}, {offset_y}, {offset_z}) ')
 arm.set_tool_offset(offset_x, offset_y, offset_z)
 

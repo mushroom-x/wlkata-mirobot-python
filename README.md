@@ -1,8 +1,7 @@
-# wlkata-mirobot-python
-Wlkata Mirobot (6DoF Robot Arm) Python  SDK
+# wlkata-mirobot-python 
+勤牛智能 Mirobot六自由度机械臂 Python SDK
 
-
-## Install Package
+## 安装包
 
 **Windows**
 ```bash
@@ -11,37 +10,49 @@ pip install wlkata-mirobot-python
 
 **Ubuntu**
 ```bash
-pip3 install wlkata-mirobot-python
+sudo pip3 install wlkata-mirobot-python
 ```
 
-## Quick Start
+## 准备工作
+
+* 将机械臂上电并连接到电脑的USB端口处
+
+* 电脑安装好了CH340的驱动
+
+* 安装好了Mirobot的Python SDK
+
+  
+
+## 快速入手
 
 ```python
 '''
-Set robot arm wrist pose by P2P trajectory plan
-P2P: point to point
+机械臂腕关节的位置控制, 点控P2P(point to point)模式
 '''
-from wlkata_mirobot import WlkataMirobot
 import time
-# Create Robot Arm Object
-# Remember to change portname.
-# - Windows: COM + ID, exp: 'COM15'
-# - Linux: /dev/ttyUSB + ID, exp: '/dev/ttyUSB0'
-arm = WlkataMirobot(portname='COM15', debug=True)
-# Robot Arm Homing
-arm.home_simultaneous()
+from wlkata_mirobot import WlkataMirobot
 
-print("Move to point A (x, y, z)")
+# 创建机械臂 
+arm = WlkataMirobot()
+# 回归机械零点 Homing (同步模式)
+arm.home()
+
+print("运动到目标点 A")
 arm.set_tool_pose(200,  20, 230)
-print(f"Current robot arm end pose:  {arm.pose}")
+print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
 time.sleep(1)
 
-print("Move to point B (x, y, z)")
+print("运动到目标点 B")
 arm.set_tool_pose(200,  20, 150)
-print(f"Current robot arm end pose: {arm.pose}")
+print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
 time.sleep(1)
 
-print("Move to point C (x, y, z, roll, pitch, yaw)")
+print("运动到目标点 C, 指定末端的姿态角")
 arm.set_tool_pose(150,  -20,  230, roll=30.0, pitch=0, yaw=45.0)
-print(f"Current robot arm end pose {arm.pose}")
+print(f"当前末端在机械臂坐标系下的位姿 {arm.pose}")
 ```
+
+## 使用手册
+
+详细的API说明与示例代码， 请参阅 `doc/WLKATA MIROBOT Python SDK使用手册/`
+

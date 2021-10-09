@@ -294,7 +294,7 @@ class WlkataMirobot(AbstractContextManager):
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 		
 	def unlock_all_axis(self):
-		'''接触各轴锁定状态'''
+		'''解锁各轴锁定状态'''
 		msg = 'M50'
 		return self.send_msg(msg, wait_ok=True, wait_idle=True)
 		
@@ -328,15 +328,7 @@ class WlkataMirobot(AbstractContextManager):
   		'''
 		msg = f'$20={int(enable)}'
 		return self.send_msg(msg, var_command=True, wait_ok=None)
-
-	def unlock_shaft(self):
-		'''
-		将Mirobot的每个轴解锁。执行完成Homing之后会自动解锁
-		注: 请谨慎使用
-		'''
-		msg = 'M50'
-		return self.send_msg(msg, wait_ok=None)
-
+	
 	def format_float_value(self, value):
 		if value is None:
 			return value
@@ -352,7 +344,7 @@ class WlkataMirobot(AbstractContextManager):
 
 		return ' '.join([instruction] + args)
 	
-	def set_joint_angle(self, joint_angles, speed=None, wait_ok=None):
+	def set_joint_angle(self, joint_angles, speed=None, is_relative=False, wait_ok=None):
 		'''
 		设置机械臂关节的角度
 		joint_angles 目标关节角度字典, key是关节的ID号, value是角度(单位°)
@@ -364,7 +356,7 @@ class WlkataMirobot(AbstractContextManager):
 				joint_angles[joint_i] = None
 
 		return self.go_to_axis(x=joint_angles[1], y=joint_angles[2], z=joint_angles[3], a=joint_angles[4], \
-			b=joint_angles[5], c=joint_angles[6], d=joint_angles[7], speed=speed, wait_ok=wait_ok)
+			b=joint_angles[5], c=joint_angles[6], d=joint_angles[7], is_relative=is_relative, speed=speed, wait_ok=wait_ok)
 
 	def go_to_axis(self, x=None, y=None, z=None, a=None, b=None, c=None, d=None, speed=None, is_relative=False, wait_ok=True):
 		'''设置关节角度/位置'''
@@ -390,19 +382,19 @@ class WlkataMirobot(AbstractContextManager):
 			return 	self.go_to_axis(d=d,
 									speed=speed, wait_ok=wait_ok, is_relative=True)
    
-	def set_tool_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, wait_ok=True):
+	def set_tool_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, is_relative=False, wait_ok=True):
 		'''设置工具位姿'''
 		if mode == "p2p":
 			# 点控模式 Point To Point
-			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
+			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, is_relative=is_relative, wait_ok=wait_ok)
 		elif mode == "linear":
 			# 直线插补 Linera Interpolation
-			self.linear_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
+			self.linear_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed,is_relative=is_relative, wait_ok=wait_ok)
 		else:
 			# 默认是点到点
 			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
    
-	def p2p_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
+	def p2p_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, is_relative=False, wait_ok=None):
 		'''点到点插补'''
 		instruction = 'M20 G90 G0'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
 		if is_relative:
@@ -418,7 +410,7 @@ class WlkataMirobot(AbstractContextManager):
 
 		return self.send_msg(msg, wait_ok=wait_ok, wait_idle=True)
 
-	def linear_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
+	def linear_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, is_relative=False, wait_ok=None):
 		'''直线插补'''
 		instruction = 'M20 G90 G1'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
 		if is_relative:
@@ -458,7 +450,7 @@ class WlkataMirobot(AbstractContextManager):
 		msg = f"$49={lift_distance}"
 		return self.send_msg(msg, wait_ok=True, wait_idle=True)
 
-	def door_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, wait_ok=None, is_relative=False):
+	def door_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, is_relative=False, wait_ok=None):
 		'''门式插补'''
 		instruction = 'M20 G90 G05'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
 		if is_relative:
