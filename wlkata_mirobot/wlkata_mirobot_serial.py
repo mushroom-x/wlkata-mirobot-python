@@ -315,7 +315,7 @@ class WlkataMirobotSerial:
         # 读入所有字符，查看 'WLKATA'是否在接收的字符串里面
         recv_str = device.readall().decode('utf-8')
         self.logger.info(f"[RECV] {recv_str}")
-        is_mirobot = 'WLKATA' in recv_str
+        is_mirobot = 'WLKATA' in recv_str or 'Qinnew' in recv_str
         # 关闭设备
         device.close()
         return is_mirobot

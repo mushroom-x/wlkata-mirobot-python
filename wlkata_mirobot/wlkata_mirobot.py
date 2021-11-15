@@ -66,8 +66,10 @@ class WlkataMirobot(AbstractContextManager):
 		'''初始化'''
   		# 设置日志等级
 		self.logger = logging.getLogger(__name__)
-		
-		self.logger.setLevel(logging.DEBUG)
+		if (debug):
+			self.logger.setLevel(logging.DEBUG)
+		else:
+			self.logger.setLevel(logging.ERROR)
 
 		self.stream_handler = ExitOnExceptionStreamHandler()
 		self.stream_handler.setLevel(logging.DEBUG if debug else logging.INFO)
@@ -382,18 +384,18 @@ class WlkataMirobot(AbstractContextManager):
 			return 	self.go_to_axis(d=d,
 									speed=speed, wait_ok=wait_ok, is_relative=True)
    
-	def set_tool_pose(self, x=None, y=None, z=None, roll=0.0, pitch=0.0, yaw=0.0, mode='p2p', speed=None, is_relative=False, wait_ok=True):
+	def set_tool_pose(self, x=None, y=None, z=None, roll=None, pitch=None, yaw=None, mode='p2p', speed=None, is_relative=False, wait_ok=True):
 		'''设置工具位姿'''
 		if mode == "p2p":
 			# 点控模式 Point To Point
-			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, is_relative=is_relative, wait_ok=wait_ok)
+			self.p2p_interpolation(x=x, y=y, z=z, a=roll, b=pitch, c=yaw, speed=speed, is_relative=is_relative, wait_ok=wait_ok)
 		elif mode == "linear":
 			# 直线插补 Linera Interpolation
-			self.linear_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed,is_relative=is_relative, wait_ok=wait_ok)
+			self.linear_interpolation(x=x, y=y, z=z, a=roll, b=pitch, c=yaw, speed=speed,is_relative=is_relative, wait_ok=wait_ok)
 		else:
 			# 默认是点到点
-			self.p2p_interpolation(x=x, y=y, z=z, a=yaw, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
-   
+			self.p2p_interpolation(x=x, y=y, z=z, a=roll, b=pitch, c=yaw, speed=speed, wait_ok=wait_ok)
+	
 	def p2p_interpolation(self, x=None, y=None, z=None, a=None, b=None, c=None, speed=None, is_relative=False, wait_ok=None):
 		'''点到点插补'''
 		instruction = 'M20 G90 G0'  # X{x} Y{y} Z{z} A{a} B{b} C{c} F{speed}
