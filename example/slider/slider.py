@@ -1,5 +1,5 @@
 '''
-机械臂回归机械零点与状态查询
+机械臂滑台示例
 '''
 import time
 from wlkata_mirobot import WlkataMirobot

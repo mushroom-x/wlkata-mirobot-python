@@ -14,24 +14,25 @@ is_home_simultaneously = True
 print("机械臂本体Homing")
 arm.home()
 
-
+# 设置传动带的运动范围
+arm.set_conveyor_range(-30000, 30000)
 print("延时2s")
 time.sleep(2)
 
 print('设置传送带的位置 0mm')
-arm.set_conveyor_posi(-200)
+arm.set_conveyor_posi(1000)
 
 print("延时2s")
 time.sleep(2)
 
 print('设置传送带的位置 300mm')
-arm.set_conveyor_posi(-300)
+arm.set_conveyor_posi(-3000)
 
 print("延时2s")
 time.sleep(2)
 
 print('设置传送带的位置 相对移动 +100mm')
-arm.set_conveyor_posi(-100, is_relative=True)
+arm.set_conveyor_posi(-1000, is_relative=True)
 
 # 更新机械臂的状态
 arm.get_status()

@@ -383,7 +383,30 @@ class WlkataMirobot(AbstractContextManager):
 		else:
 			return 	self.go_to_axis(d=d,
 									speed=speed, wait_ok=wait_ok, is_relative=True)
-   
+	
+	def set_conveyor_range(self, d_min=-30000, d_max=30000):
+		'''设置传送带的位移范围'''
+		# 约束范围
+		if d_min < -30000:
+			d_min = -30000
+		if d_max > 30000:
+			d_min = 30000
+		# 设置传动带负方向最大行程
+		msg = f"$143={d_min}"
+		self.send_msg(msg, wait_ok=True, wait_idle=True)
+		# 设置传送带正方向最大行程
+		msg = f'$133={d_max}'
+		self.send_msg(msg, wait_ok=True, wait_idle=True)
+
+	def set_conveyor_posi(self, d, speed=None, is_relative=False, wait_ok=True):
+		'''设置传送带位置, 单位mm'''
+		if not is_relative:
+			return 	self.go_to_axis(d=d,
+									speed=speed, wait_ok=wait_ok)
+		else:
+			return 	self.go_to_axis(d=d,
+									speed=speed, wait_ok=wait_ok, is_relative=True)
+	
 	def set_tool_pose(self, x=None, y=None, z=None, roll=None, pitch=None, yaw=None, mode='p2p', speed=None, is_relative=False, wait_ok=True):
 		'''设置工具位姿'''
 		if mode == "p2p":
@@ -646,6 +669,11 @@ class WlkataMirobot(AbstractContextManager):
 	@property
 	def slider(self):
 		'''获取滑台(Mirobot第七轴)的位置'''
+		return self.status.angle.d
+
+	@property
+	def conveyor(self):
+		'''获取传送带(Mirobot第七轴)的位置'''
 		return self.status.angle.d
 
 	@property
