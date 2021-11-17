@@ -4,9 +4,10 @@
 
 ## 版本历史
 
-| 版本号 | 更新时间   | 变更记录   | 编写人       |
-| ------ | ---------- | ---------- | ------------ |
-| 1.0    | 2021-10-09 | 文档初始化 | 邢顺凯(阿凯) |
+| 版本号 | 更新时间   | 变更记录           | 编写人       |
+| ------ | ---------- | ------------------ | ------------ |
+| 1.0    | 2021-10-09 | 文档初始化         | 邢顺凯(阿凯) |
+| 1.1    | 2021-11-17 | 添加了传送带的适配 | 邢顺凯(阿凯) |
 
 
 
@@ -388,7 +389,7 @@ time.sleep(2)
 
 
 
-## 设置滑台位置(Set Slider Posi)
+## 滑台控制(Slider Control)
 
 
 
@@ -422,7 +423,7 @@ arm.set_slider_posi(300, speed=2000)
 
 ```python
 '''
-机械臂回归机械零点与状态查询
+滑台控制示例
 '''
 import time
 from wlkata_mirobot import WlkataMirobot
@@ -462,6 +463,114 @@ arm.get_status()
 print(f"当前的滑台的位置 :{arm.slider} mm")
 
 ```
+
+## 传送带控制(Conveyor Control)
+
+### API - `set_conveyor_range` 设置传送带范围
+
+**函数原型**
+
+```python
+def set_conveyor_range(self, d_min=-30000, d_max=30000):
+```
+
+
+
+**输入函数**
+
+* `d_min` : `float` 传送带位置最小值 , 单位mm
+
+  最小值不能小于`-30000`
+
+* `d_max` : `float` 传送带位置最大值, 单位mm
+
+  最大值不能大于`30000`
+
+**使用示例**
+
+```python
+# 设置传动带的运动范围
+arm.set_conveyor_range(-30000, 30000)
+```
+
+
+
+### API-`set_conveyor-posi` 设置传送带位置
+
+**函数原型**
+
+```python
+def set_conveyor_posi(self, d, speed=None, is_relative=False, wait_ok=True):
+```
+
+**输入函数**
+
+* `d` : `float` 传送带的位置， 单位mm
+* `speed` : `float` 移动速度， 单位mm/min
+* `is_relative`  : `bool` 是否为相对移动 
+* `wait_ok` :  `bool` 是否等待机械臂接收到指令后返回“ok”信息。
+
+**使用示例**
+
+```python
+print('设置传送带的位置 1000mm')
+arm.set_conveyor_posi(1000)
+```
+
+
+
+### 示例脚本-传送带控制
+
+`conveyor.py`
+
+```python
+'''
+机械臂传送带示例
+'''
+import time
+from wlkata_mirobot import WlkataMirobot
+
+print("实例化Mirobot机械臂实例")
+arm = WlkataMirobot()
+
+# 机械臂本体与滑台是否同时Homing
+is_home_simultaneously = True
+
+# 注: 机械臂不需要Homing
+print("机械臂本体Homing")
+arm.home()
+
+# 设置传动带的运动范围
+arm.set_conveyor_range(-30000, 30000)
+print("延时2s")
+time.sleep(2)
+
+print('设置传送带的位置 1000mm')
+arm.set_conveyor_posi(1000)
+
+print("延时2s")
+time.sleep(2)
+
+print('设置传送带的位置 -3000mm')
+arm.set_conveyor_posi(-3000)
+
+print("延时2s")
+time.sleep(2)
+
+print('设置传送带的位置 相对移动 -1000mm')
+arm.set_conveyor_posi(-1000, is_relative=True)
+
+# 更新机械臂的状态
+arm.get_status()
+print(f"当前的传送带的的位置 :{arm.conveyor} mm")
+
+```
+
+
+
+
+
+
 
 
 

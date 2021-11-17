@@ -19,19 +19,19 @@ arm.set_conveyor_range(-30000, 30000)
 print("延时2s")
 time.sleep(2)
 
-print('设置传送带的位置 0mm')
+print('设置传送带的位置 1000mm')
 arm.set_conveyor_posi(1000)
 
 print("延时2s")
 time.sleep(2)
 
-print('设置传送带的位置 300mm')
+print('设置传送带的位置 -3000mm')
 arm.set_conveyor_posi(-3000)
 
 print("延时2s")
 time.sleep(2)
 
-print('设置传送带的位置 相对移动 +100mm')
+print('设置传送带的位置 相对移动 -1000mm')
 arm.set_conveyor_posi(-1000, is_relative=True)
 
 # 更新机械臂的状态
