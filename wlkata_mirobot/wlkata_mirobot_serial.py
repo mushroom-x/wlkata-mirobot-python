@@ -24,7 +24,7 @@ os_is_posix = os.name == 'posix'
 
 class DeviceSerial:
 	'''串口设备，在Serial的基础上再做一层封装'''
-	def __init__(self, portname='', baudrate=0, stopbits=1, timeout=0.2, exclusive=False, debug=False):
+	def __init__(self, portname='', baudrate=115200, stopbits=1, timeout=0.2, exclusive=False, debug=False):
 		""" Initialization of `DeviceSerial` class
 		串口设备初始化
 
@@ -69,7 +69,8 @@ class DeviceSerial:
 
 		if os_is_posix:
 			# 设置独占访问模式（仅POSIX）。 如果端口已经以独占访问模式打开，则不能以独占访问模式打开端口。
-			self.serialport = serial.Serial(exclusive=exclusive)
+			# self.serialport = serial.Serial(exclusive=exclusive)
+			self.serialport = serial.Serial()
 		else:
 			self.serialport = serial.Serial()
 		self._is_open = False
@@ -252,6 +253,8 @@ class WlkataMirobotSerial:
 			self.default_portname = portname
 		# 创建串口设备
 		self.serial_device = DeviceSerial(**serial_device_kwargs)
+		# 打开串口
+		self.serial_device.open()
 		# 重置机械臂
 		# 强制重启
 		self.serial_device.serialport.write("%\n".encode("utf-8"))

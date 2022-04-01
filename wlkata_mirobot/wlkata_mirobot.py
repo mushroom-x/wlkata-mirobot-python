@@ -200,29 +200,27 @@ class WlkataMirobot(AbstractContextManager):
 		'''获取Mirobot的状态信息, 回传的是状态字符'''
 		instruction = '?'
 		ret = self.send_msg(instruction, disable_debug=disable_debug, wait_ok=False, wait_idle=False)
-		time.sleep(0.1)
-		recv_str = self.device.serial_device.read(timeout=0.10)
+		recv_str = self.device.serial_device.readline(timeout=0.10)
 		self.logger.debug(f"[RECV] {recv_str}")
 		return recv_str
 
 	def get_status(self, disable_debug=False):
 		'''获取并更新Mirobot的状态'''
 		# 因为存在信息丢包的可能,因此需要多查询几次
+		# print("Get Status ...")
 		status = None
 		while True:	
 			msg_seg = self.send_cmd_get_status(disable_debug=disable_debug)
 			if "<" in msg_seg and ">" in msg_seg:
 				status_msg = msg_seg
 				try:
-					print("开始解析状态字符串")
+					# print("开始解析状态字符串")
 					ret, status = self._parse_status(status_msg)
-					print(f"状态解析: {ret}")
+					# print(f"状态解析: {ret}")
 					if ret:
 						break
 				except Exception as e:
-					print(e)
-			else:
-				print(f"status code is not legal: {msg_seg}")
+					logging.error(e)
 			# 等待一会儿
 			time.sleep(0.1)
 
