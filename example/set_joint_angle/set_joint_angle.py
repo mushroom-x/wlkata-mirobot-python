@@ -12,6 +12,8 @@ arm.set_joint_angle({1:100.0})
 print("动作执行完毕")
 # 状态查询
 print(f"状态查询: {arm.get_status()}")
+# 打印关节1的角度
+print(f"关节1的角度: {arm.status.angle.a}")
 # 停顿2s
 time.sleep(2)
 
@@ -22,5 +24,7 @@ arm.set_joint_angle(target_angles)
 print("动作执行完毕")
 # 状态查询
 print(f"状态查询: {arm.get_status()}")
+# 打印关节1的角度
+print(f"关节1的角度: {arm.status.angle.a}")
 # 停顿2s
 time.sleep(2)

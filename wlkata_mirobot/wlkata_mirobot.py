@@ -223,10 +223,10 @@ class WlkataMirobot(AbstractContextManager):
 					logging.error(e)
 			# 等待一会儿
 			time.sleep(0.1)
-
+		# 设置当前的状态
 		self._set_status(status)
 		return status
-
+	
 	def _set_status(self, status):
 		'''设置新的状态'''
 		self.status = status
