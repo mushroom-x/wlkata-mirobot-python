@@ -8,6 +8,7 @@
 | ------ | ---------- | ------------------ | ------------ |
 | 1.0    | 2021-10-09 | 文档初始化         | 邢顺凯(阿凯) |
 | 1.1    | 2021-11-17 | 添加了传送带的适配 | 邢顺凯(阿凯) |
+| 1.2    | 2022-04-02 | 修改部分案例跟代码 | 邢顺凯(阿凯) |
 
 
 
@@ -986,11 +987,11 @@ arm.pose.y
 # 工具在机械臂坐标系下的Z轴坐标
 arm.pose.z
 # 工具的姿态 横滚角, 单位°
-arm.roll
+arm.pose.roll
 # 工具的姿态 俯仰角, 单位°
-arm.pitch
+arm.pose.pitch
 # 工具的姿态 偏航角, 单位°
-arm.yaw
+arm.pose.yaw
 ```
 
 ### 气泵状态
@@ -1010,6 +1011,26 @@ arm.gripper_pwm
 # 获取机械臂的运动模式
 # 布尔值，代表当前运动模式是相对运动还是绝对运动. 
 arm.motion_mode
+```
+
+
+
+### 示例脚本-获取机械臂状态
+
+`get_status.py`
+
+```python
+'''
+获取机械臂的状态
+'''
+from wlkata_mirobot import WlkataMirobot
+# 创建机械臂对象
+arm = WlkataMirobot()
+# 机械臂回归零点
+arm.home()
+# 打印机械臂当前的状态
+print("获取机械臂的状态 ?")
+print(arm.get_status())
 ```
 
 
