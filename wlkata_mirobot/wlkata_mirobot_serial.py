@@ -424,11 +424,10 @@ class WlkataMirobotSerial:
 				self.logger.exception(ValueError('Portname must be provided! Example: `portname="COM3"`'))
 
 		self.serial_device.portname = portname
-
 		self.serial_device.open()
-
-		return self.wait_for_ok(reset_expected=True)
-
+		# return self.wait_for_ok(reset_expected=True)
+		return True
+	
 	def disconnect(self):
 		'''断开与Mirobot的连接，断开串口'''
 		if getattr(self, 'serial_device', None) is not None:
