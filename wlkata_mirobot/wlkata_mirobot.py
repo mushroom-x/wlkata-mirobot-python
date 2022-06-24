@@ -282,22 +282,22 @@ class WlkataMirobot(AbstractContextManager):
 		'''单轴Homing'''
 		if not isinstance(axis_id, int) or not (axis_id >= 1 and axis_id <= 7):
 			return False
-		msg = f'$H{axis_id}'
+		msg = f'$h{axis_id}'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_6axis(self):
 		'''六轴Homing'''
-		msg = f'$H'
+		msg = f'$h'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_6axis_in_turn(self):
 		'''六轴Homing, 各关节依次Homing'''
-		msg = f'$HH'
+		msg = f'$hh'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_7axis(self):
 		'''七轴Homing(本体 + 滑台)'''
-		msg = f'$H0'
+		msg = f'$h0'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 		
 	def unlock_all_axis(self):

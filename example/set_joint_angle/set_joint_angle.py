@@ -3,7 +3,7 @@
 '''
 from wlkata_mirobot import WlkataMirobot
 import time
-arm = WlkataMirobot(debug=True)
+arm = WlkataMirobot()
 print("Homing")
 arm.home()
 

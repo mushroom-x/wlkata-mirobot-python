@@ -5,7 +5,7 @@ from wlkata_mirobot import WlkataMirobot
 import time
 
 print("实例化Mirobot机械臂实例")
-arm = WlkataMirobot()
+arm = WlkataMirobot(debug=True)
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
