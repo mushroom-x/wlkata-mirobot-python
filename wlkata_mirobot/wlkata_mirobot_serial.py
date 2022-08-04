@@ -131,8 +131,8 @@ class DeviceSerial:
 			# 超时判断
 			t_cur = time.time()
 			if (t_cur - t_start) >= timeout:
-				return msg_recv.decode("utf-8").strip()
-			
+				# 添加非UTF-8编码数据的容错
+				return msg_recv.decode("utf-8", "ignore").strip()
 			try:
 				msg_seg = self.serialport.readline()
 				if len(msg_seg) > 0:
@@ -321,7 +321,8 @@ class WlkataMirobotSerial:
 		device.write("%\n".encode("utf-8"))
 		time.sleep(1)
 		# 读入所有字符，查看 'WLKATA'是否在接收的字符串里面
-		recv_str = device.readall().decode('utf-8')
+		# 添加非UTF-8编码数据的容错
+		recv_str = device.readall().decode('utf-8', "ignore")
 		self.logger.info(f"[RECV] {recv_str}")
 		is_mirobot = 'WLKATA' in recv_str or 'Qinnew' in recv_str
 		# 关闭设备
@@ -412,7 +413,8 @@ class WlkataMirobotSerial:
 		'''清空接收缓冲区'''
 		cache_msg = ""
 		while(self.serial_device.serialport.in_waiting):
-			cache_msg += self.serial_device.serialport.read().decode('utf-8')
+			# 添加非UTF-8编码数据的容错
+			cache_msg += self.serial_device.serialport.read().decode('utf-8', 'ignore')
 		return cache_msg
 
 	def connect(self, portname=None):
