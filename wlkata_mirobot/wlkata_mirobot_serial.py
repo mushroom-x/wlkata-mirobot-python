@@ -246,11 +246,11 @@ class WlkataMirobotSerial:
 		if autofindport and portname is None:
 			self.default_portname = self._find_portname()
 			""" The default portname to use when making connections. To override this on a individual basis, provide portname to each invokation of `WlkataMirobotGcodeProtocol.connect`. """
-			serial_device_kwargs['portname'] = self.default_portname
 			self.logger.info(f"Using Serial Port \"{self.default_portname}\"")
 		else:
 			# 设置端口号
 			self.default_portname = portname
+		serial_device_kwargs['portname'] = self.default_portname
 		# 创建串口设备
 		self.serial_device = DeviceSerial(**serial_device_kwargs)
 		# 打开串口
