@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
 import setuptools
+from setuptools import find_packages
 
 setuptools.setup(name='wlkata-mirobot-python',
-                 version='0.1.11',
+                 version='0.1.12',
                  description="WKlata Mirobot Python SDK",
                  author='Shunkai Xing',
                  author_email='xingshunkai@qq.com',
                  long_description=open("README.rst", "r", encoding="utf-8").read(),
                  long_description_content_type = 'text/markdown',
                  url="https://github.com/mushroom-x/wlkata-mirobot-python",
-                 packages=  ['wlkata_mirobot'],
+                 packages=find_packages(exclude=["script", "example", "doc"]),
                  classifiers="""
                  Development Status :: 4 - Beta
                  Programming Language :: Python :: 3 :: Only
@@ -43,9 +44,9 @@ setuptools.setup(name='wlkata-mirobot-python',
                  install_requires=[
                      'pyserial', 
                  ],
-                 package_dir={
-                     'wlkata_mirobot': 'wlkata_mirobot'
-                 },
+                #  package_dir={
+                #      'wlkata_mirobot': 'wlkata_mirobot'
+                #  },
                  package_data={
                     'wlkata_mirobot': ['resources/*'], 
                  }

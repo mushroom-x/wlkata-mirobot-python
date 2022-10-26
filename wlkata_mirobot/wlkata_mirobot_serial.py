@@ -24,7 +24,7 @@ os_is_posix = os.name == 'posix'
 
 class DeviceSerial:
 	'''串口设备，在Serial的基础上再做一层封装'''
-	def __init__(self, portname='', baudrate=115200, stopbits=1, timeout=0.2, exclusive=False, debug=False):
+	def __init__(self, portname=None, baudrate=115200, stopbits=1, timeout=0.2, exclusive=False, debug=False):
 		""" Initialization of `DeviceSerial` class
 		串口设备初始化
 
@@ -225,13 +225,14 @@ class WlkataMirobotSerial:
 	""" A class for bridging the interface between `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and `mirobot.serial_device.DeviceSerial`"""
 	def __init__(self, mirobot, portname=None, baudrate=None, stopbits=None, exclusive=True, debug=False, logger=None, autofindport=True):
 		'''Mirobot串口通信接口'''
+		self.logger.info(f"WlkataMirobotSerial 端口号: {portname}")
 		self.mirobot = mirobot
 		if logger is not None:
 			self.logger = logger
 
 		self._debug = debug
 		serial_device_kwargs = {'debug': debug, 'exclusive': exclusive}
-
+		
 		# check if baudrate was passed in args or kwargs, if not use the default value instead
 		if baudrate is None:
 			# 设置默认的波特率
@@ -243,15 +244,18 @@ class WlkataMirobotSerial:
 
 		# if portname was not passed in and autofindport is set to true, autosearch for a serial port
 		# 如果没有指定端口号，自行进行搜索
-		if autofindport and portname is None:
+		if portname is not None:
+			# 设置端口号
+			self.default_portname = portname
+			serial_device_kwargs['portname'] = portname
+		elif autofindport and portname is None:
 			self.default_portname = self._find_portname()
 			""" The default portname to use when making connections. To override this on a individual basis, provide portname to each invokation of `WlkataMirobotGcodeProtocol.connect`. """
 			serial_device_kwargs['portname'] = self.default_portname
 			self.logger.info(f"Using Serial Port \"{self.default_portname}\"")
-		else:
-			# 设置端口号
-			self.default_portname = portname
+		
 		# 创建串口设备
+		# print("创建串口对象 DeviceSerial")
 		self.serial_device = DeviceSerial(**serial_device_kwargs)
 		# 打开串口
 		self.serial_device.open()

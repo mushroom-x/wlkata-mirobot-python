@@ -282,22 +282,22 @@ class WlkataMirobot(AbstractContextManager):
 		'''单轴Homing'''
 		if not isinstance(axis_id, int) or not (axis_id >= 1 and axis_id <= 7):
 			return False
-		msg = f'$h{axis_id}'
+		msg = f'$H{axis_id}'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_6axis(self):
 		'''六轴Homing'''
-		msg = f'$h'
+		msg = f'$H'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_6axis_in_turn(self):
 		'''六轴Homing, 各关节依次Homing'''
-		msg = f'$hh'
+		msg = f'$HH'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 	
 	def home_7axis(self):
 		'''七轴Homing(本体 + 滑台)'''
-		msg = f'$h0'
+		msg = f'$H0'
 		return self.send_msg(msg, wait_ok=False, wait_idle=True)
 		
 	def unlock_all_axis(self):
@@ -580,7 +580,7 @@ class WlkataMirobot(AbstractContextManager):
 		# 旋转角度转换为PWM值
 		ratio = ((theta - angle_min) / (angle_max - angle_min))
 		pwm = int(self.GRIPPER_CLOSE_PWM_VALUE + ratio * (self.GRIPPER_OPEN_PWM_VALUE - self.GRIPPER_CLOSE_PWM_VALUE))
-		print(f"爪子逆向运动学 角度:{theta}  angle_min: {angle_min} angle_max: {angle_max} PWM: {pwm}")
+		# print(f"爪子逆向运动学 角度:{theta}  angle_min: {angle_min} angle_max: {angle_max} PWM: {pwm}")
 		# 设置爪子的PWM
 		self.set_gripper(pwm)
 		
