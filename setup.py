@@ -8,7 +8,7 @@ setuptools.setup(name='wlkata-mirobot-python',
                  description="WKlata Mirobot Python SDK",
                  author='Shunkai Xing',
                  author_email='xingshunkai@qq.com',
-                 long_description=open("README.rst", "r", encoding="utf-8").read(),
+                 long_description=open("README.md", "r", encoding="utf-8").read(),
                  long_description_content_type = 'text/markdown',
                  url="https://github.com/mushroom-x/wlkata-mirobot-python",
                  packages=find_packages(exclude=["script", "example", "doc"]),
@@ -44,9 +44,6 @@ setuptools.setup(name='wlkata-mirobot-python',
                  install_requires=[
                      'pyserial', 
                  ],
-                #  package_dir={
-                #      'wlkata_mirobot': 'wlkata_mirobot'
-                #  },
                  package_data={
                     'wlkata_mirobot': ['resources/*'], 
                  }

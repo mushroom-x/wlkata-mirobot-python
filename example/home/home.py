@@ -5,9 +5,11 @@ from wlkata_mirobot import WlkataMirobot
 import time
 
 print("实例化Mirobot机械臂实例")
-# arm = WlkataMirobot(debug=True)
-# 指定设备名称 Ubuntu
-arm = WlkataMirobot(debug=True, portname="/dev/ttyUSB0")
+debug = False # 调试模式 配置为True可以显示更多的日志信息
+# 自动检索端口号
+arm = WlkataMirobot(debug=debug)
+# Ubuntu操作系统上， 指定设备名称
+# arm = WlkataMirobot(debug=debug, portname="/dev/ttyUSB0")
 
 
 # 机械臂Home 多轴并行

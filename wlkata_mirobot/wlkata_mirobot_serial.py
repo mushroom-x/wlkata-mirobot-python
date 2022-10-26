@@ -50,7 +50,7 @@ class DeviceSerial:
 
 		"""
 		self.portname = str(portname)
-		print(f"DeviceSerial portname:  {self.portname}")
+		# print(f"DeviceSerial portname:  {self.portname}")
 		self.baudrate = int(baudrate)
 		self.stopbits = int(stopbits)
 		self.timeout = int(timeout)
@@ -158,11 +158,14 @@ class DeviceSerial:
 			self.serialport.timeout = self.timeout
 			
 			try:
-				self.logger.debug(f"Wlkata Mirobot Python SDK")
-				self.logger.debug(f"- Attempting to open serial port {self.portname}")
+				self.logger.debug(f"欢迎使用 Wlkata Mirobot Python SDK")
+				self.logger.debug(f"- 尝试打开端口号 {self.portname}")
 				self.serialport.open()
 				self._is_open = True
-				self.logger.debug(f"- Succeeded in opening serial port {self.portname}")
+				self.logger.debug(f"- 端口号成功打开 {self.portname}")
+				self.logger.debug("等待1s")
+				time.sleep(1)
+	
 				return True
 			except Exception as e:
 				self.logger.exception(SerialDeviceOpenError(e))
@@ -226,7 +229,7 @@ class WlkataMirobotSerial:
 	""" A class for bridging the interface between `mirobot.wlkata_mirobot_gcode_protocol.WlkataMirobotGcodeProtocol` and `mirobot.serial_device.DeviceSerial`"""
 	def __init__(self, mirobot, portname=None, baudrate=None, stopbits=None, exclusive=True, debug=False, logger=None, autofindport=True):
 		'''Mirobot串口通信接口'''
-		self.logger.info(f"WlkataMirobotSerial 端口号: {portname}")
+		# self.logger.info(f"WlkataMirobotSerial 端口号: {portname}")
 		self.mirobot = mirobot
 		if logger is not None:
 			self.logger = logger

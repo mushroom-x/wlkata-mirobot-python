@@ -3,15 +3,28 @@
 
 ## 安装包
 
-**Windows**
+### Windows
+通过pip安装
 ```bash
 pip install wlkata-mirobot-python
 ```
 
-**Ubuntu**
+从源码编译安装
+```
+python -m pip install .
+```
+
+### Ubuntu
+通过pip安装
 ```bash
 sudo pip3 install wlkata-mirobot-python
 ```
+从源码编译安装
+```
+sudo python3 -m pip install .
+```
+
+
 
 ## 准备工作
 
