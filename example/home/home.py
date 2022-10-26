@@ -10,7 +10,8 @@ debug = False # 调试模式 配置为True可以显示更多的日志信息
 arm = WlkataMirobot(debug=debug)
 # Ubuntu操作系统上， 指定设备名称
 # arm = WlkataMirobot(debug=debug, portname="/dev/ttyUSB0")
-
+# Windows操作系统上， 指定设备名称
+# arm = WlkataMirobot(debug=debug, portname="COM5")
 
 # 机械臂Home 多轴并行
 print("机械臂Homing开始")
