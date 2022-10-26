@@ -60,7 +60,7 @@ class WlkataMirobot(AbstractContextManager):
 	GRIPPER_LINK_B = 18.0   # 连杆的长度
 	GRIPPER_LINK_C = 3.0    # 平行爪向内缩的尺寸
 	
-	def __init__(self, *device_args, debug=False, connection_type='serial', \
+	def __init__(self, *device_args, portname=None, debug=False, connection_type='serial', \
 		autoconnect=True, autofindport=True, exclusive=True, \
 		default_speed=2000, reset_file=None, wait_ok=False, **device_kwargs):
 		'''初始化'''
@@ -87,8 +87,9 @@ class WlkataMirobot(AbstractContextManager):
 			args_names = serial_device_init_fn.__code__.co_varnames[:serial_device_init_fn.__code__.co_argcount]
 			args_dict = dict(zip(args_names, device_args))
 			args_dict.update(device_kwargs)
-
+			
 			args_dict['mirobot'] = self
+			args_dict['portname'] = portname
 			args_dict['exclusive'] = exclusive
 			args_dict['debug'] = debug
 			args_dict['logger'] = self.logger

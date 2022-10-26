@@ -50,6 +50,7 @@ class DeviceSerial:
 
 		"""
 		self.portname = str(portname)
+		print(f"DeviceSerial portname:  {self.portname}")
 		self.baudrate = int(baudrate)
 		self.stopbits = int(stopbits)
 		self.timeout = int(timeout)
