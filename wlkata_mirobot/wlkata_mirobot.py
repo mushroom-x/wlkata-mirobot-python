@@ -308,7 +308,7 @@ class WlkataMirobot(AbstractContextManager):
 		
 	def go_to_zero(self):
 		'''回零-运动到名义上的各轴零点'''
-		msg = '$M'
+		msg = 'M21 G90 G00 X0 Y0 Z0 A0 B0 C0 F2000'
 		return self.send_msg(msg, wait_ok=True, wait_idle=True)
 	
 	def set_speed(self, speed):
